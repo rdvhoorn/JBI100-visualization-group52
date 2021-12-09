@@ -25,21 +25,23 @@ server = app.server
 APP_PATH = str(pathlib.Path(__file__).parent.resolve())
 
 df_lat_lon = pd.read_csv(
-    os.path.join(APP_PATH, os.path.join("data", "uk_lat_lon_counties.csv"))
+    os.path.join(APP_PATH, os.path.join("data", "lat_lon_counties.csv"))
 )
+
 df_lat_lon["FIPS "] = df_lat_lon["FIPS "].apply(lambda x: str(x).zfill(5))
 
 df_full_data = pd.read_csv(
     os.path.join(
-        APP_PATH, os.path.join("data", "uk_age_adjusted_death_rate_no_quotes.csv")
+        APP_PATH, os.path.join("data", "age_adjusted_death_rate_no_quotes.csv")
     )
 )
 df_full_data["County Code"] = df_full_data["County Code"].apply(
     lambda x: str(x).zfill(5)
 )
-# df_full_data["County"] = (
-#         df_full_data["Unnamed: 0"] + ", " + df_full_data.County.map(str)
-# )
+
+df_full_data["County"] = (
+        df_full_data["Unnamed: 0"] + ", " + df_full_data.County.map(str)
+)
 
 YEARS = [2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015]
 
@@ -260,13 +262,22 @@ def display_map(year, figure):
             )
         )
 
+    if "layout" in figure:
+        lat = figure["layout"]["mapbox"]["center"]["lat"]
+        lon = figure["layout"]["mapbox"]["center"]["lon"]
+        zoom = figure["layout"]["mapbox"]["zoom"]
+    else:
+        lat = 38.72490
+        lon = -95.61446
+        zoom = 3.5
+
     layout = dict(
         mapbox=dict(
             layers=[],
             accesstoken=mapbox_access_token,
             style=mapbox_style,
-            center=dict(lat=54.138, lon=-3.9),
-            zoom=5.3,
+            center=dict(lat=lat, lon=lon),
+            zoom=zoom,
         ),
         hovermode="closest",
         margin=dict(r=0, l=0, t=0, b=0),
@@ -274,8 +285,21 @@ def display_map(year, figure):
         dragmode="lasso",
     )
 
+    geo_layer = dict(
+        sourcetype="json",
+        source="https://http://127.0.0.1:8050/assets/data/lad.json",
+        type="fill",
+        color="#25a27b",
+        opacity=DEFAULT_OPACITY,
+        # CHANGE THIS
+        fill=dict(outlinecolor="#afafaf"),
+    )
+
+    layout["mapbox"]["layers"].append(geo_layer)
+
     fig = dict(data=data, layout=layout)
     return fig
+
 
 
 @app.callback(Output("heatmap-title", "children"), [Input("years-slider", "value")])
@@ -294,7 +318,9 @@ def update_map_title(year):
         Input("years-slider", "value"),
     ],
 )
+
 def display_selected_data(selectedData, chart_dropdown, year):
+
     if selectedData is None:
         return dict(
             data=[dict(x=0, y=0)],
@@ -306,6 +332,7 @@ def display_selected_data(selectedData, chart_dropdown, year):
                 margin=dict(t=75, r=50, b=100, l=75),
             ),
         )
+
     pts = selectedData["points"]
     fips = [str(pt["text"].split("<br>")[-1]) for pt in pts]
     for i in range(len(fips)):
