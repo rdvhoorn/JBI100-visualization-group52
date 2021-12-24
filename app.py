@@ -287,6 +287,9 @@ def display_map(year, figure):
 
 @app.callback(Output("heatmap-title", "children"), [Input("years-slider", "value")])
 def update_map_title(year):
+    if year == 2021:
+        return "heatmap of population adjusted accident rate of last 5 years"
+
     return "Heatmap of population adjusted accident rate per district for {0}".format(
         year
     )
