@@ -9,6 +9,9 @@ mapbox_style = "mapbox://styles/rvdhoorn/ckx1u7m3v3k0o14pam2buej1s"
 DEFAULT_OPACITY = 0.8
 
 def initialize_left_side_functionality(app, df_lat_lon):
+    with open("./assets/data/lad.json") as infile:
+        json_data = json.load(infile)
+
     @app.callback(
         Output("county-choropleth", "figure"),
         [Input("years-slider", "value")],
@@ -19,9 +22,6 @@ def initialize_left_side_functionality(app, df_lat_lon):
 
         if year == 2021:
             variable_name = "number_of_accidents"
-
-        with open("./assets/data/lad.json") as infile:
-            json_data = json.load(infile)
 
         def color(x, max):
             max_val = 255
