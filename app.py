@@ -10,6 +10,7 @@ from dash import dcc
 import pandas as pd
 from dash.dependencies import Input, Output, State
 from colormap import rgb2hex
+import cufflinks as cf
 
 r = lambda: random.randint(0, 255)
 
@@ -28,22 +29,13 @@ server = app.server
 APP_PATH = str(pathlib.Path(__file__).parent.resolve())
 
 df_lat_lon = pd.read_csv(
-    os.path.join(APP_PATH, os.path.join("data", "lat_lon_counties.csv"))
+    os.path.join(APP_PATH, os.path.join("data", "lat_lon_counties_uk.csv"))
 )
-
-df_lat_lon["FIPS "] = df_lat_lon["FIPS "].apply(lambda x: str(x).zfill(5))
 
 df_full_data = pd.read_csv(
     os.path.join(
-        APP_PATH, os.path.join("data", "age_adjusted_death_rate_no_quotes.csv")
+        APP_PATH, os.path.join("data", "merged (only cars).csv")
     )
-)
-df_full_data["County Code"] = df_full_data["County Code"].apply(
-    lambda x: str(x).zfill(5)
-)
-
-df_full_data["County"] = (
-        df_full_data["Unnamed: 0"] + ", " + df_full_data.County.map(str)
 )
 
 YEARS = [2016, 2017, 2018, 2019, 2020, 2021]
@@ -127,23 +119,11 @@ app.layout = html.Div(
                         dcc.Dropdown(
                             options=[
                                 {
-                                    "label": "Histogram of total number of deaths (single year)",
-                                    "value": "show_absolute_deaths_single_year",
-                                },
-                                {
-                                    "label": "Histogram of total number of deaths (1999-2016)",
-                                    "value": "absolute_deaths_all_time",
-                                },
-                                {
-                                    "label": "Age-adjusted death rate (single year)",
-                                    "value": "show_death_rate_single_year",
-                                },
-                                {
-                                    "label": "Trends in age-adjusted death rate (1999-2016)",
-                                    "value": "death_rate_all_time",
+                                    "label": "Accidents per age",
+                                    "value": "show_accidents_per_age",
                                 },
                             ],
-                            value="show_death_rate_single_year",
+                            value="show_accidents_per_age",
                             id="chart-dropdown",
                         ),
                         dcc.Graph(
@@ -207,7 +187,7 @@ def display_map(year, figure):
 
     data = [
         dict(
-            lat=df_lat_lon["Latitude "],
+            lat=df_lat_lon["Latitude"],
             lon=df_lat_lon["Longitude"],
             text=df_lat_lon["Hover"],
             type="scattermapbox",
@@ -317,116 +297,46 @@ def display_selected_data(selectedData, chart_dropdown, year):
         )
 
     pts = selectedData["points"]
-    fips = [str(pt["text"].split("<br>")[-1]) for pt in pts]
-    for i in range(len(fips)):
-        if len(fips[i]) == 4:
-            fips[i] = "0" + fips[i]
-    dff = df_full_data[df_full_data["County Code"].isin(fips)]
-    dff = dff.sort_values("Year")
+    counties = [str(pt["text"].split("<br>")[0]) for pt in pts]
+    dff = df_full_data[df_full_data["district_name"].isin(counties)]
+    dff = dff.sort_values("accident_year")
 
-    regex_pat = re.compile(r"Unreliable", flags=re.IGNORECASE)
-    dff["Age Adjusted Rate"] = dff["Age Adjusted Rate"].replace(regex_pat, 0)
-
-    if chart_dropdown != "death_rate_all_time":
-        title = "Absolute deaths per county, <b>1999-2016</b>"
-        AGGREGATE_BY = "Deaths"
-        if "show_absolute_deaths_single_year" == chart_dropdown:
-            dff = dff[dff.Year == year]
-            title = "Absolute deaths per county, <b>{0}</b>".format(year)
-        elif "show_death_rate_single_year" == chart_dropdown:
-            dff = dff[dff.Year == year]
-            title = "Age-adjusted death rate per county, <b>{0}</b>".format(year)
-            AGGREGATE_BY = "Age Adjusted Rate"
+    if chart_dropdown == "show_accidents_per_age":
+        title = "Accidents per age, <b>2016-2020</b>"
+        AGGREGATE_BY = "age_of_driver"
 
         dff[AGGREGATE_BY] = pd.to_numeric(dff[AGGREGATE_BY], errors="coerce")
-        deaths_or_rate_by_fips = dff.groupby("County")[AGGREGATE_BY].sum()
-        deaths_or_rate_by_fips = deaths_or_rate_by_fips.sort_values()
-        # Only look at non-zero rows:
-        deaths_or_rate_by_fips = deaths_or_rate_by_fips[deaths_or_rate_by_fips > 0]
-        fig = deaths_or_rate_by_fips.iplot(
-            kind="bar", y=AGGREGATE_BY, title=title, asFigure=True
+        dff = dff[["accident_index", AGGREGATE_BY]]
+        rate_per_age = dff.groupby(AGGREGATE_BY, as_index=False).count()
+        rate_per_age.rename(columns={"accident_index": "count"}, inplace=True)
+        rate_per_age.reset_index()
+        rate_per_age.drop([0], inplace=True)
+        fig = rate_per_age.iplot(
+            kind="bar", y='count', title=title, asFigure=True
         )
 
         fig_layout = fig["layout"]
         fig_data = fig["data"]
 
-        fig_data[0]["text"] = deaths_or_rate_by_fips.values.tolist()
+        fig_data[0]["text"] = rate_per_age.values.tolist()
         fig_data[0]["marker"]["color"] = (227, 227, 227)
         fig_data[0]["marker"]["opacity"] = 1
         fig_data[0]["marker"]["line"]["width"] = 0
         fig_data[0]["textposition"] = "outside"
-        fig_layout["paper_bgcolor"] = (227, 227, 227)
-        fig_layout["plot_bgcolor"] = (227, 227, 227)
-        fig_layout["font"]["color"] = "#2cfec1"
-        fig_layout["title"]["font"]["color"] = "#2cfec1"
-        fig_layout["xaxis"]["tickfont"]["color"] = "#2cfec1"
-        fig_layout["yaxis"]["tickfont"]["color"] = "#2cfec1"
-        fig_layout["xaxis"]["gridcolor"] = "#5b5b5b"
-        fig_layout["yaxis"]["gridcolor"] = "#5b5b5b"
+        fig_layout["paper_bgcolor"] = "#e3e3e3"
+        fig_layout["plot_bgcolor"] = "#e3e3e3"
+        fig_layout["font"]["color"] = "#000000"
+        fig_layout["title"]["font"]["color"] = "#000000"
+        fig_layout["xaxis"]["tickfont"]["color"] = "#000000"
+        fig_layout["yaxis"]["tickfont"]["color"] = "#000000"
+        fig_layout["xaxis"]["gridcolor"] = "#787878"
+        fig_layout["yaxis"]["gridcolor"] = "#787878"
         fig_layout["margin"]["t"] = 75
         fig_layout["margin"]["r"] = 50
         fig_layout["margin"]["b"] = 100
         fig_layout["margin"]["l"] = 50
 
         return fig
-
-    fig = dff.iplot(
-        kind="area",
-        x="Year",
-        y="Age Adjusted Rate",
-        text="County",
-        categories="County",
-        colors=[
-            "#1b9e77",
-            "#d95f02",
-            "#7570b3",
-            "#e7298a",
-            "#66a61e",
-            "#e6ab02",
-            "#a6761d",
-            "#666666",
-            "#1b9e77",
-        ],
-        vline=[year],
-        asFigure=True,
-    )
-
-    for i, trace in enumerate(fig["data"]):
-        trace["mode"] = "lines+markers"
-        trace["marker"]["size"] = 4
-        trace["marker"]["line"]["width"] = 1
-        trace["type"] = "scatter"
-        for prop in trace:
-            fig["data"][i][prop] = trace[prop]
-
-    # Only show first 500 lines
-    fig["data"] = fig["data"][0:500]
-
-    fig_layout = fig["layout"]
-
-    # See plot.ly/python/reference
-    # fig_layout["yaxis"]["title"] = "Age-adjusted death rate per county per year"
-    fig_layout["xaxis"]["title"] = ""
-    fig_layout["yaxis"]["fixedrange"] = True
-    fig_layout["xaxis"]["fixedrange"] = False
-    fig_layout["hovermode"] = "closest"
-    fig_layout["title"] = "<b>{0}</b> counties selected".format(len(fips))
-    fig_layout["legend"] = dict(orientation="v")
-    fig_layout["autosize"] = True
-    fig_layout["paper_bgcolor"] = "#1f2630"
-    fig_layout["plot_bgcolor"] = "#1f2630"
-    fig_layout["font"]["color"] = "#2cfec1"
-    fig_layout["xaxis"]["tickfont"]["color"] = "#2cfec1"
-    fig_layout["yaxis"]["tickfont"]["color"] = "#2cfec1"
-    fig_layout["xaxis"]["gridcolor"] = "#5b5b5b"
-    fig_layout["yaxis"]["gridcolor"] = "#5b5b5b"
-
-    if len(fips) > 500:
-        fig["layout"][
-            "title"
-        ] = "Age-adjusted death rate per county per year <br>(only 1st 500 shown)"
-
-    return fig
 
 
 if __name__ == "__main__":
