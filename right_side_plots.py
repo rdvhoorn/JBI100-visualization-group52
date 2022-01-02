@@ -24,9 +24,12 @@ def initilize_right_side_functionality(app, df_full_data):
                 ),
             )
 
+        # Select all data of the counties that were included in the lasso
         pts = selectedData["points"]
         counties = [str(pt["text"].split("<br>")[0]) for pt in pts]
         dff = df_full_data[df_full_data["district_name"].isin(counties)]
+
+        # Sort data on accident year
         dff = dff.sort_values("accident_year")
 
         if chart_dropdown == "show_accidents_per_age":

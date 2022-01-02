@@ -8,6 +8,7 @@ mapbox_style = "mapbox://styles/rvdhoorn/ckx1u7m3v3k0o14pam2buej1s"
 
 DEFAULT_OPACITY = 0.8
 
+
 def initialize_left_side_functionality(app, df_lat_lon):
     with open("./assets/data/lad.json") as infile:
         json_data = json.load(infile)
@@ -18,12 +19,26 @@ def initialize_left_side_functionality(app, df_lat_lon):
         [State("county-choropleth", "figure")],
     )
     def display_map(year, figure):
-        variable_name = "number_of_accidents_" + str(year)
+        """
+        This function generates what is shown on the map on the left side of the visualiztion
+        :param year:    The year of the slider. if on 'sum', the value is '2021'
+        :param figure:
+        :return:        The figure to be shown
+        """
 
+        # Based on the year in the slider, a different variable of the dataset is shown. Here the name of that
+        # variable is set.
+        variable_name = "number_of_accidents_" + str(year)
         if year == 2021:
             variable_name = "number_of_accidents"
 
         def color(x, max):
+            """
+            A local function to generate a color for the overlay for all the data.
+            :param x:       The value for which a color needs to be generated
+            :param max:     The max value of the scale
+            :return:        An rgb color value
+            """
             max_val = 255
             if x <= 0:
                 return rgb2hex(191, 191, 191)
@@ -50,15 +65,17 @@ def initialize_left_side_functionality(app, df_lat_lon):
 
         data = [
             dict(
-                lat=df_lat_lon["Latitude"],
-                lon=df_lat_lon["Longitude"],
-                text=df_lat_lon["Hover"],
+                lat=df_lat_lon["Latitude"],     # The latitude of the hover points
+                lon=df_lat_lon["Longitude"],    # The longitude of the hover points
+                text=df_lat_lon["Hover"],       # The text to be shown when hovering near the points
                 type="scattermapbox",
                 hoverinfo="text",
                 marker=dict(size=5, color="white", opacity=0),
             )
         ]
 
+        # Here the legend of the graph is created
+        # First, we make the title
         annotations = [
             dict(
                 showarrow=False,
@@ -70,8 +87,8 @@ def initialize_left_side_functionality(app, df_lat_lon):
             )
         ]
 
+        # Then the little bars
         binsize = int(maximum / 5)
-
         for i in range(1, maximum, binsize - 1):
             col = color(i, maximum)
             annotations.append(
@@ -97,6 +114,7 @@ def initialize_left_side_functionality(app, df_lat_lon):
             lon = -95.61446
             zoom = 3.5
 
+        # Here we use the mapbox api to get the map
         layout = dict(
             mapbox=dict(
                 layers=[],
@@ -111,6 +129,7 @@ def initialize_left_side_functionality(app, df_lat_lon):
             dragmode="lasso",
         )
 
+        # Load the geojson data for the district layout, and give each district a color using the color function
         for feature in json_data['features']:
             geo_layer = dict(
                 sourcetype="geojson",
@@ -126,7 +145,6 @@ def initialize_left_side_functionality(app, df_lat_lon):
 
         fig = dict(data=data, layout=layout)
         return fig
-
 
     @app.callback(Output("heatmap-title", "children"), [Input("years-slider", "value")])
     def update_map_title(year):

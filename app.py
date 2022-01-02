@@ -21,11 +21,12 @@ app = dash.Dash(
         {"name": "viewport", "content": "width=device-width, initial-scale=1.0"}
     ],
 )
-app.title = "Visualization assignment"
+
+# Some settings
+app.title = "Insurance data exploration"
 server = app.server
 
 # Load data
-
 APP_PATH = str(pathlib.Path(__file__).parent.resolve())
 
 df_lat_lon = pd.read_csv(
@@ -38,14 +39,13 @@ df_full_data = pd.read_csv(
     )
 )
 
+# Dont remove 2021, it is the 'sum' year
 YEARS = [2016, 2017, 2018, 2019, 2020, 2021]
-
-DEFAULT_OPACITY = 0.8
 
 mapbox_access_token = "pk.eyJ1IjoicnZkaG9vcm4iLCJhIjoiY2t3eGVtbGNrMGRwNzJ3bnJucWp4emoweiJ9.5P0vCt-6KnIubabETLsymA"
 mapbox_style = "mapbox://styles/rvdhoorn/ckx1u7m3v3k0o14pam2buej1s"
 
-# App layout
+# Here we define the main layout of the visualization
 app.layout = html.Div(
     id="root",
     children=[
@@ -73,7 +73,7 @@ app.layout = html.Div(
                                     min=min(YEARS),
                                     max=max(YEARS),
                                     value=min(YEARS),
-                                    marks={
+                                    marks={ # Here the labels of the slider are set, so 2021 is changed to 'sum'
                                         str(year): {
                                             "label": "sum" if year == 2021 else str(year),
                                             "style": {"color": "#000"},
