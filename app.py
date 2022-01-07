@@ -119,8 +119,14 @@ app.layout = html.Div(
                         dcc.Dropdown(
                             options=[
                                 {
-                                    "label": "Accidents per age",
+                                    "label": "Accidents per age of driver",
                                     "value": "show_accidents_per_age",
+                                },
+                                {   "label": "Accidents per age of vehicle",
+                                    "value": "show_accidents_per_vehicle_age",
+                                },
+                                {   "label": "Accidents per engine capacity",
+                                    "value": "show_accidents_per_engine_capacity",
                                 },
                             ],
                             value="show_accidents_per_age",
