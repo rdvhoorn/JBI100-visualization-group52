@@ -137,7 +137,7 @@ def accidents_per_engine_capacity(dff):
 
     dff = dff['engine_capacity_cc']
     fig = dff.iplot(
-        kind="histogram", x='engine_capacity_cc', bins = 25, title=title, asFigure=True
+        kind="histogram", x='engine_capacity_cc', bins = 50, title=title, asFigure=True
     )
 
     fig_layout = fig["layout"]
@@ -146,7 +146,7 @@ def accidents_per_engine_capacity(dff):
     fig.update_layout(xaxis_title = "Engine capacity (cc)")
     fig.update_layout(yaxis_title = "Number of accidents")
 
-    fig_data[0]["text"] = rate_per_age.values.tolist()
+    #fig_data[0]["text"] = rate_per_age.values.tolist()
     fig_data[0]["marker"]["color"] = (227, 227, 227)
     fig_data[0]["marker"]["opacity"] = 1
     fig_data[0]["marker"]["line"]["width"] = 0
