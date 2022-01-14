@@ -1,3 +1,4 @@
+from turtle import color
 import pandas as pd
 from dash.dependencies import Input, Output
 import cufflinks as cf
@@ -91,13 +92,16 @@ def accidents_per_vehicle_age(dff):
     """
     title = "Accidents per age of vehicle, <b>2016-2020</b>"
     AGGREGATE_BY = "age_of_vehicle"
+    AGGREGATE_BY2 = "accident_severity"
 
     dff[AGGREGATE_BY] = pd.to_numeric(dff[AGGREGATE_BY], errors="coerce")
-    dff = dff[["accident_index", AGGREGATE_BY]]
-    rate_per_age = dff.groupby(AGGREGATE_BY, as_index=False).count()
+    dff[AGGREGATE_BY2] = pd.to_numeric(dff[AGGREGATE_BY2], errors="coerce")
+    dff = dff[["accident_index", AGGREGATE_BY, AGGREGATE_BY2]]
+    rate_per_age = dff.groupby([AGGREGATE_BY, AGGREGATE_BY2], as_index=False).count()
     rate_per_age.rename(columns={"accident_index": "count"}, inplace=True)
     rate_per_age.reset_index()
-    rate_per_age.drop([0], inplace=True)
+    rate_per_age.drop([0,1,2], inplace=True)
+    print(rate_per_age)
     fig = rate_per_age.iplot(
         kind="bar", x='age_of_vehicle', y='count', title=title, asFigure=True
     )
@@ -108,8 +112,11 @@ def accidents_per_vehicle_age(dff):
     fig_layout = fig["layout"]
     fig_data = fig["data"]
 
-    fig_data[0]["text"] = rate_per_age.values.tolist()
-    fig_data[0]["marker"]["color"] = (227, 227, 227)
+    print(fig_data)
+
+    #fig_data[0]["text"] = dff.values.tolist()
+    #fig_data[0]["marker"]["color"] = (100,0,0)
+    #fig_data[0]['line']['color'] = rate_per_age['accident_severity']
     fig_data[0]["marker"]["opacity"] = 1
     fig_data[0]["marker"]["line"]["width"] = 0
     fig_data[0]["textposition"] = "outside"
@@ -125,6 +132,9 @@ def accidents_per_vehicle_age(dff):
     fig_layout["margin"]["r"] = 50
     fig_layout["margin"]["b"] = 100
     fig_layout["margin"]["l"] = 50
+
+    #print(dff)
+    print(fig_data)
 
     return fig
 
