@@ -15,10 +15,13 @@ def initialize_left_side_functionality(app, df_lat_lon):
 
     @app.callback(
         Output("county-choropleth", "figure"),
-        [Input("years-slider", "value")],
+        [
+            Input("county-choropleth", "selectedData"),
+            Input("years-slider", "value"),
+        ],
         [State("county-choropleth", "figure")],
     )
-    def display_map(year, figure):
+    def display_map(selectedData, year, figure):
         """
         This function generates what is shown on the map on the left side of the visualiztion
         :param year:    The year of the slider. if on 'sum', the value is '2021'
@@ -26,13 +29,19 @@ def initialize_left_side_functionality(app, df_lat_lon):
         :return:        The figure to be shown
         """
 
+        # Select all data of the counties that were included in the lasso
+        counties = None
+        if selectedData is not None:
+            pts = selectedData["points"]
+            counties = [str(pt["text"].split("<br>")[0]) for pt in pts]
+
         # Based on the year in the slider, a different variable of the dataset is shown. Here the name of that
         # variable is set.
         variable_name = "number_of_accidents_" + str(year)
         if year == 2021:
             variable_name = "number_of_accidents"
 
-        def color(x, max):
+        def color(x, max, county_name):
             """
             A local function to generate a color for the overlay for all the data.
             :param x:       The value for which a color needs to be generated
@@ -44,6 +53,9 @@ def initialize_left_side_functionality(app, df_lat_lon):
                 return rgb2hex(191, 191, 191)
 
             val = int((x / max) * max_val)
+
+            if counties is not None and county_name in counties:
+                return rgb2hex(230, max_val - val, max_val - val)
 
             return rgb2hex(255, max_val - val, max_val - val)
 
@@ -90,7 +102,7 @@ def initialize_left_side_functionality(app, df_lat_lon):
         # Then the little bars
         binsize = int(maximum / 5)
         for i in range(1, maximum, binsize - 1):
-            col = color(i, maximum)
+            col = color(i, maximum, "dkdkkd")
             annotations.append(
                 dict(
                     arrowcolor=col,
@@ -136,7 +148,7 @@ def initialize_left_side_functionality(app, df_lat_lon):
                 source=feature,
                 type="fill",
                 color=color(feature['properties'][variable_name] / feature['properties']['population'] * 100000,
-                            maximum),
+                            maximum, feature['properties']["LAD13NM"]),
                 opacity=DEFAULT_OPACITY,
                 fill=dict(outlinecolor="#afafaf")
             )
