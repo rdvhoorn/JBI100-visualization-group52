@@ -1,7 +1,9 @@
+from re import A
 from turtle import color
 import pandas as pd
 from dash.dependencies import Input, Output
 import cufflinks as cf
+import plotly.express as px
 
 
 def initilize_right_side_functionality(app, df_full_data):
@@ -95,46 +97,55 @@ def accidents_per_vehicle_age(dff):
     AGGREGATE_BY2 = "accident_severity"
 
     dff[AGGREGATE_BY] = pd.to_numeric(dff[AGGREGATE_BY], errors="coerce")
-    dff[AGGREGATE_BY2] = pd.to_numeric(dff[AGGREGATE_BY2], errors="coerce")
+    #dff[AGGREGATE_BY2] = dff.accident_severity.astype('category')
+    #dff[AGGREGATE_BY2]
     dff = dff[["accident_index", AGGREGATE_BY, AGGREGATE_BY2]]
     rate_per_age = dff.groupby([AGGREGATE_BY, AGGREGATE_BY2], as_index=False).count()
     rate_per_age.rename(columns={"accident_index": "count"}, inplace=True)
     rate_per_age.reset_index()
     rate_per_age.drop([0,1,2], inplace=True)
-    print(rate_per_age)
-    fig = rate_per_age.iplot(
-        kind="bar", x='age_of_vehicle', y='count', title=title, asFigure=True
-    )
+    rate_per_age['accident_severity'] = rate_per_age['accident_severity'].replace([1,2,3], ['light','moderate','severe'])
+    #print(rate_per_age.dtypes)
+
+    color_discrete_map = {'light' : 'green' , 'moderate' : 'red', 'severe' : 'black'}
+    fig = px.bar(rate_per_age, x="age_of_vehicle", y="count", color="accident_severity", title=title, color_discrete_map = color_discrete_map)
+    #fig.show()
+
+    #fig = rate_per_age.iplot(
+    #    kind="bar", x='age_of_vehicle', y='count', title=title, asFigure=True
+    #)
     
-    fig.update_layout(xaxis_title = "Age of vehicle (years)")
-    fig.update_layout(yaxis_title = "Number of accidents")
+    #fig.update_layout(xaxis_title = "Age of vehicle (years)")
+    #fig.update_layout(yaxis_title = "Number of accidents")
 
-    fig_layout = fig["layout"]
-    fig_data = fig["data"]
+    #fig_layout = fig["layout"]
+    #fig_data = fig["data"]
 
-    print(fig_data)
+    #print(fig_data)
 
     #fig_data[0]["text"] = dff.values.tolist()
     #fig_data[0]["marker"]["color"] = (100,0,0)
     #fig_data[0]['line']['color'] = rate_per_age['accident_severity']
-    fig_data[0]["marker"]["opacity"] = 1
-    fig_data[0]["marker"]["line"]["width"] = 0
-    fig_data[0]["textposition"] = "outside"
-    fig_layout["paper_bgcolor"] = "#e3e3e3"
-    fig_layout["plot_bgcolor"] = "#e3e3e3"
-    fig_layout["font"]["color"] = "#000000"
-    fig_layout["title"]["font"]["color"] = "#000000"
-    fig_layout["xaxis"]["tickfont"]["color"] = "#000000"
-    fig_layout["yaxis"]["tickfont"]["color"] = "#000000"
-    fig_layout["xaxis"]["gridcolor"] = "#787878"
-    fig_layout["yaxis"]["gridcolor"] = "#787878"
-    fig_layout["margin"]["t"] = 75
-    fig_layout["margin"]["r"] = 50
-    fig_layout["margin"]["b"] = 100
-    fig_layout["margin"]["l"] = 50
+    #fig_data[0]["color"] = "#ffc0cb"
+    #fig_data[0]['line']['color'] = 'rgb (00,75,80,1.0)'
+    #fig_data[0]["marker"]["opacity"] = 1
+    #fig_data[0]["marker"]["line"]["width"] = 0
+    #fig_data[0]["textposition"] = "outside"
+    #fig_layout["paper_bgcolor"] = "#e3e3e3"
+    #fig_layout["plot_bgcolor"] = "#e3e3e3"
+    #fig_layout["font"]["color"] = "#000000"
+    #fig_layout["title"]["font"]["color"] = "#000000"
+    #fig_layout["xaxis"]["tickfont"]["color"] = "#000000"
+    #fig_layout["yaxis"]["tickfont"]["color"] = "#000000"
+    #fig_layout["xaxis"]["gridcolor"] = "#787878"
+    #fig_layout["yaxis"]["gridcolor"] = "#787878"
+    #fig_layout["margin"]["t"] = 75
+    #fig_layout["margin"]["r"] = 50
+    #fig_layout["margin"]["b"] = 100
+    #fig_layout["margin"]["l"] = 50
 
     #print(dff)
-    print(fig_data)
+    #print(fig_data)
 
     return fig
 
