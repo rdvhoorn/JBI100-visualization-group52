@@ -1,6 +1,8 @@
 import pandas as pd
 from dash.dependencies import Input, Output
 import cufflinks as cf
+from colormap import rgb2hex
+import json
 
 
 def initilize_right_side_functionality(app, df_full_data):
@@ -34,18 +36,22 @@ def initilize_right_side_functionality(app, df_full_data):
         dff = dff.sort_values("accident_year")
 
         if chart_dropdown == "show_accidents_per_age":
-            return accidents_per_age(dff)
+            return accidents_per_age(dff, year)
         if chart_dropdown == "show_accidents_per_vehicle_age":
-            return accidents_per_vehicle_age(dff)
+            return accidents_per_vehicle_age(dff, year)
         if chart_dropdown == "show_accidents_per_engine_capacity":
-            return accidents_per_engine_capacity(dff)
+            return accidents_per_engine_capacity(dff, year)
 
 
-def accidents_per_age(dff):
+def accidents_per_age(dff, year):
     """
     This function generates the right side figure displaying accidents per age
     """
-    title = "Accidents per age of driver, <b>2016-2020</b>"
+    if year == 2021:
+        title = "Accidents per age of driver for 2016-2020"
+    else: 
+        title = "Accidents per age of driver for {0}".format(year)
+
     AGGREGATE_BY = "age_of_driver"
 
     dff[AGGREGATE_BY] = pd.to_numeric(dff[AGGREGATE_BY], errors="coerce")
@@ -85,11 +91,15 @@ def accidents_per_age(dff):
     return fig
 
 
-def accidents_per_vehicle_age(dff):
+def accidents_per_vehicle_age(dff, year):
     """
     This function generates the right side figure displaying accidents per age
     """
-    title = "Accidents per age of vehicle, <b>2016-2020</b>"
+    if year == 2021:
+        title = "Accidents per age of vehicle for 2016-2020"   
+    else: 
+        title = "Accidents per age of vehicle for {0}".format(year)
+
     AGGREGATE_BY = "age_of_vehicle"
 
     dff[AGGREGATE_BY] = pd.to_numeric(dff[AGGREGATE_BY], errors="coerce")
@@ -129,11 +139,15 @@ def accidents_per_vehicle_age(dff):
     return fig
 
 
-def accidents_per_engine_capacity(dff):
+def accidents_per_engine_capacity(dff, year):
     """
     This function generates the right side figure displaying accidents per age
     """
-    title = "Accidents per engine capacity, <b>2016-2020</b>"
+    if year == 2021:
+        title = "Accidents per engine capacity for 2016-2020"
+    else: 
+        title = "Accidents per engine capacity for {0}".format(year)
+
 
     dff = dff['engine_capacity_cc']
     fig = dff.iplot(

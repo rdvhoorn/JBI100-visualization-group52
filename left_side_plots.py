@@ -151,6 +151,4 @@ def initialize_left_side_functionality(app, df_lat_lon):
         if year == 2021:
             return "heatmap of population adjusted accident rate of last 5 years"
 
-        return "Heatmap of population adjusted accident rate per district for {0}".format(
-            year
-        )
+        return "Heatmap of population adjusted accident rate per district for {0}".format(year)
