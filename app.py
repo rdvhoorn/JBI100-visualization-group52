@@ -99,7 +99,7 @@ app.layout = html.Div(
                                                 accesstoken=mapbox_access_token,
                                                 style=mapbox_style,
                                                 center=dict(
-                                                    lat=55, lon=-3.9
+                                                    lat=52.9, lon=-3.9
                                                 ),
                                                 pitch=0,
                                                 zoom=5.3,

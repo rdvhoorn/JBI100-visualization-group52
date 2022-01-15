@@ -136,10 +136,6 @@ def initialize_left_side_functionality(app, df_lat_lon):
             lat = figure["layout"]["mapbox"]["center"]["lat"]
             lon = figure["layout"]["mapbox"]["center"]["lon"]
             zoom = figure["layout"]["mapbox"]["zoom"]
-        else:
-            lat = 38.72490
-            lon = -95.61446
-            zoom = 3.5
 
         # Here we use the mapbox api to get the map
         layout = dict(
