@@ -75,11 +75,26 @@ def initialize_left_side_functionality(app, df_lat_lon):
 
         maximum = max(accidents_per_100000)
 
+        # Make up hover text
+        hover_text_df = df_lat_lon["Hover"].to_frame()
+        title = "Number of Accidents"
+        if year != 2021:
+            title += " in " + str(year) + ": "
+        else:
+            title += ": "
+
+        # Loop over all counties to set the hover text specifically
+        for feature in json_data['features']:
+            county_name = feature['properties']["LAD13NM"]
+            variable_number = feature['properties'][variable_name]
+
+            hover_text_df.loc[hover_text_df.Hover.str.contains(county_name)] += "<br>" + title + str(variable_number)
+
         data = [
             dict(
                 lat=df_lat_lon["Latitude"],     # The latitude of the hover points
                 lon=df_lat_lon["Longitude"],    # The longitude of the hover points
-                text=df_lat_lon["Hover"],       # The text to be shown when hovering near the points
+                text=hover_text_df["Hover"],       # The text to be shown when hovering near the points
                 type="scattermapbox",
                 hoverinfo="text",
                 marker=dict(size=5, color="white", opacity=0),
