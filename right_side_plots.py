@@ -60,8 +60,7 @@ def accidents_per_age(dff):
     rate_per_age.drop([0,1,2], inplace=True)
     rate_per_age['accident_severity'] = rate_per_age['accident_severity'].replace([1,2,3], ['light','moderate','severe'])
     color_discrete_map = {'light' : 'green' , 'moderate' : 'red', 'severe' : 'black'}
-    fig = px.bar(rate_per_age, x="age_of_driver", y="count", color="accident_severity", title=title, 
-                 color_discrete_map = color_discrete_map, legend_title_text='Accident Severity')
+    fig = px.bar(rate_per_age, x="age_of_driver", y="count", color="accident_severity", title=title, color_discrete_map = color_discrete_map)
     
     
     #fig = rate_per_age.iplot(
