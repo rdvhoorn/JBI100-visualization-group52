@@ -179,12 +179,13 @@ def accidents_per_vehicle_age(dff, year, df_full_data):
 
     dff[AGGREGATE_BY] = pd.to_numeric(dff[AGGREGATE_BY], errors="coerce")
     dff = dff[["accident_index", AGGREGATE_BY, AGGREGATE_BY2]]
+    
     rate_per_age = dff.groupby([AGGREGATE_BY, AGGREGATE_BY2], as_index=False).count()
     rate_per_age.rename(columns={"accident_index": "count"}, inplace=True)
     rate_per_age.reset_index()
     rate_per_age.drop([0,1,2], inplace=True)
     rate_per_age['accident_severity'] = rate_per_age['accident_severity'].replace([1,2,3], ['light','moderate','severe'])
-    color_discrete_map = {'light' : 'green' , 'moderate' : 'red', 'severe' : 'black'}
+    #color_discrete_map = {'light' : 'green' , 'moderate' : 'red', 'severe' : 'black'}
    
     # total UK data added - add data description
     df_full_data[AGGREGATE_BY] = pd.to_numeric(df_full_data[AGGREGATE_BY], errors="coerce")
@@ -219,6 +220,10 @@ def accidents_per_vehicle_age(dff, year, df_full_data):
 
     return fig
 
+    #color_discrete_map = {'light' : 'green' , 'moderate' : 'red', 'severe' : 'black'}
+    #fig = px.bar(rate_per_age, x="age_of_vehicle", y="count", color="accident_severity", title=title, color_discrete_map = color_discrete_map)
+    
+    #return fig
 
 def accidents_per_engine_capacity(dff, year):
     """
