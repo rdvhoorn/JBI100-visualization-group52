@@ -67,7 +67,7 @@ def accidents_per_age(dff, year, df_full_data):
     rate_per_age.drop([0,1,2], inplace=True)
     rate_per_age['accident_severity'] = rate_per_age['accident_severity'].replace([1,2,3], ['light','moderate','severe'])
     color_discrete_map = {'light' : 'green' , 'moderate' : 'red', 'severe' : 'black'}
-    fig = px.bar(rate_per_age, x="age_of_driver", y="count", color="accident_severity", title=title, 
+    fig = px.bar(rate_per_age, x=AGGREGATE_BY, y="count", color=AGGREGATE_BY2, title=title, 
                  color_discrete_map = color_discrete_map, category_orders={"accident_severity": ["light", "moderate", "severe"]})
     
     # total UK data added - add data description
@@ -192,7 +192,7 @@ def accidents_per_vehicle_age(dff, year, df_full_data):
     rate_per_age.drop([0,1,2], inplace=True)
     rate_per_age['accident_severity'] = rate_per_age['accident_severity'].replace([1,2,3], ['light','moderate','severe'])
     color_discrete_map = {'light' : 'green' , 'moderate' : 'red', 'severe' : 'black'}
-    fig = px.bar(rate_per_age, x="age_of_vehicle", y="count", color="accident_severity", title=title, 
+    fig = px.bar(rate_per_age, x=AGGREGATE_BY, y="count", color=AGGREGATE_BY2, title=title, 
                  color_discrete_map = color_discrete_map, category_orders={"accident_severity": ["light", "moderate", "severe"]})
    
     # total UK data added - add data description
@@ -272,7 +272,7 @@ def accidents_per_engine_capacity(dff, year):
     rate_per_age.drop([0,1,2], inplace=True)
     rate_per_age['accident_severity'] = rate_per_age['accident_severity'].replace([1,2,3], ['light','moderate','severe'])
     color_discrete_map = {'light' : 'green' , 'moderate' : 'red', 'severe' : 'black'}
-    fig = px.histogram(rate_per_age, x=AGGREGATE_BY, y="count", title=title, color="accident_severity", nbins=200, 
+    fig = px.histogram(rate_per_age, x=AGGREGATE_BY, y="count", title=title, color=AGGREGATE_BY2, nbins=100, 
                        color_discrete_map=color_discrete_map, category_orders={"accident_severity": ["light", "moderate", "severe"]})
     
     fig.update_layout(xaxis_title = "Engine capacity (cc)")
