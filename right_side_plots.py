@@ -65,31 +65,31 @@ def accidents_per_age(dff, year, df_full_data):
     rate_per_age.rename(columns={"accident_index": "count"}, inplace=True)
     rate_per_age.reset_index()
     rate_per_age.drop([0,1,2], inplace=True)
-    rate_per_age['accident_severity'] = rate_per_age['accident_severity'].replace([1,2,3], ['light','moderate','severe'])
-    color_discrete_map = {'light' : 'green' , 'moderate' : 'red', 'severe' : 'black'}
-    fig = px.bar(rate_per_age, x=AGGREGATE_BY, y="count", color=AGGREGATE_BY2, title=title, 
-                 color_discrete_map = color_discrete_map, category_orders={"accident_severity": ["light", "moderate", "severe"]})
+    rate_per_age['accident_severity'] = rate_per_age['accident_severity'].replace([1,2,3], ['green','crimson','black'])
+    #rate_per_age['accident_severity'] = rate_per_age['accident_severity'].replace([1,2,3], ['light','moderate','severe'])
+    #color_discrete_map = {'light' : 'green' , 'moderate' : 'red', 'severe' : 'black'}
+    #fig = px.bar(rate_per_age, x=AGGREGATE_BY, y="count", color=AGGREGATE_BY2, title=title, 
+    #             color_discrete_map = color_discrete_map, category_orders={"accident_severity": ["light", "moderate", "severe"]})
     
     # total UK data added - add data description
     df_full_data[AGGREGATE_BY] = pd.to_numeric(df_full_data[AGGREGATE_BY], errors="coerce")
-    df_full_data = df_full_data[["accident_index", AGGREGATE_BY]]
-    rate_per_age_fulldata = df_full_data.groupby(AGGREGATE_BY, as_index=False).count()
+    df_full_data = df_full_data[["accident_index", AGGREGATE_BY, AGGREGATE_BY2]]
+    rate_per_age_fulldata = df_full_data.groupby([AGGREGATE_BY, AGGREGATE_BY2], as_index=False).count()
     rate_per_age_fulldata.rename(columns={"accident_index": "count"}, inplace=True)
     rate_per_age_fulldata.reset_index()
-    rate_per_age_fulldata.drop([0], inplace=True)
+    rate_per_age_fulldata.drop([0,1,2], inplace=True)
+    rate_per_age_fulldata['accident_severity'] = rate_per_age_fulldata['accident_severity'].replace([1,2,3], ['green','crimson','black'])
 
-    """
+    
     # total UK data added - create the figure with total of UK shown as well
     fig = go.Figure()
     fig.add_trace(go.Bar(x=rate_per_age[AGGREGATE_BY], y=rate_per_age['count'],
-                name='Selected countries',
-                marker_color='rgb(26, 118, 255)'
+                name='Selected countries', marker_color=rate_per_age[AGGREGATE_BY2],
                 ))
     fig.add_trace(go.Bar(x=rate_per_age_fulldata[AGGREGATE_BY], y=rate_per_age_fulldata['count'],
-                name='Total UK',
-                marker_color='rgb(55, 83, 109)'
+                name='Total UK', marker_color=rate_per_age_fulldata[AGGREGATE_BY2]
                 ))
-    """
+    
 
     # figure of selected countries (without total UK data)
     #fig = rate_per_age.iplot(
@@ -100,6 +100,7 @@ def accidents_per_age(dff, year, df_full_data):
     fig.update_layout(xaxis_title = "Age of driver (years)")
     fig.update_layout(yaxis_title = "Number of accidents")
     fig.update_layout(legend_title_text = 'Accident Severity')
+    #fig.update_layout(color=AGGREGATE_BY2)
 
 
     fig_layout = fig["layout"]
