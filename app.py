@@ -8,6 +8,7 @@ from dash import html
 from dash import dcc
 import pandas as pd
 import cufflinks as cf
+from dash.dependencies import Input, Output, State
 
 from right_side_plots import initilize_right_side_functionality
 from left_side_plots import initialize_left_side_functionality
@@ -19,7 +20,7 @@ app = dash.Dash(
     __name__,
     meta_tags=[
         {"name": "viewport", "content": "width=device-width, initial-scale=1.0"}
-    ],
+    ]
 )
 
 # Some settings
@@ -73,7 +74,7 @@ app.layout = html.Div(
                                     min=min(YEARS),
                                     max=max(YEARS),
                                     value=min(YEARS),
-                                    marks={ # Here the labels of the slider are set, so 2021 is changed to 'sum'
+                                    marks={  # Here the labels of the slider are set, so 2021 is changed to 'sum'
                                         str(year): {
                                             "label": "sum" if year == 2021 else str(year),
                                             "style": {"color": "#000"},
@@ -113,47 +114,115 @@ app.layout = html.Div(
                     ],
                 ),
                 html.Div(
-                    id="graph-container",
+                    id='control-tabs',
+                    className='control-tabs',
                     children=[
-                        html.P(id="chart-selector", children="Select chart:"),
-                        dcc.Dropdown(
-                            options=[
-                                {
-                                    "label": "Accidents per age of driver",
-                                    "value": "show_accidents_per_age",
-                                },
-                                {   "label": "Accidents per age of vehicle",
-                                    "value": "show_accidents_per_vehicle_age",
-                                },
-                                {   "label": "Accidents per engine capacity",
-                                    "value": "show_accidents_per_engine_capacity",
-                                },
-                            ],
-                            value="show_accidents_per_age",
-                            id="chart-dropdown",
-                        ),
-                        dcc.Graph(
-                            id="selected-data",
-                            figure=dict(
-                                data=[dict(x=0, y=0)],
-                                layout=dict(
-                                    paper_bgcolor=(227, 227, 227),
-                                    plot_bgcolor=(227, 227, 227),
-                                    autofill=True,
-                                    margin=dict(t=75, r=50, b=100, l=50),
+                        dcc.Tabs(
+                            id='tabs',
+                            value='graphs',
+                            children=[
+                                dcc.Tab(
+                                    label="Graphs",
+                                    className="tab",
+                                    value='graphs',
+                                    children=[
+                                        html.P(id="chart-selector", children="Select chart:"),
+                                        dcc.Dropdown(
+                                            options=[
+                                                {
+                                                    "label": "Accidents per age of driver",
+                                                    "value": "show_accidents_per_age",
+                                                },
+                                                {"label": "Accidents per age of vehicle",
+                                                 "value": "show_accidents_per_vehicle_age",
+                                                 },
+                                                {"label": "Accidents per engine capacity",
+                                                 "value": "show_accidents_per_engine_capacity",
+                                                 },
+                                            ],
+                                            value="show_accidents_per_age",
+                                            id="chart-dropdown",
+                                        ),
+                                        dcc.Graph(
+                                            id="selected-data",
+                                            figure=dict(
+                                                data=[dict(x=0, y=0)],
+                                                layout=dict(
+                                                    paper_bgcolor=(227, 227, 227),
+                                                    plot_bgcolor=(227, 227, 227),
+                                                    autofill=True,
+                                                    margin=dict(t=75, r=50, b=100, l=50),
+                                                ),
+                                            ),
+                                        ),
+                                    ],
                                 ),
-                            ),
+
+                                dcc.Tab(
+                                    label="Selected Districts",
+                                    value="sel-dist",
+                                    className="tab",
+                                    children=[
+                                        html.Div(
+                                            id="selected-districts",
+                                        )
+                                    ]
+                                ),
+
+                                dcc.Tab(
+                                    label="General info",
+                                    id="general-info",
+                                    value="gen-info"
+                                )
+                            ]
                         ),
-                    ],
+                    ]
                 ),
             ],
         ),
     ],
 )
 
+
+@app.callback(
+    Output("selected-districts", "children"),
+    [
+        Input("county-choropleth", "selectedData"),
+    ]
+)
+def listSelectedDistricts(selectedData):
+    if selectedData is None or not selectedData["points"]:
+        return [html.P("No districts are currently selected. Use the lasso tool to select districts")]
+
+    pts = selectedData["points"]
+    districts = [str(pt["text"].split("<br>")[0]) for pt in pts]
+    ps = []
+    for district in districts:
+        ps.append(html.P(district))
+
+    return ps
+
+
+@app.callback(
+    Output("general-info", "children"),
+    [
+        Input("county-choropleth", "selectedData"),
+        Input("years-slider", "value")
+    ]
+)
+def construct_general_info(selectedData, year):
+    if selectedData is None or not selectedData["points"]:
+        return [html.P("No districts are currently selected. Use the lasso tool to select districts")]
+
+    pts = selectedData["points"]
+    districts = [str(pt["text"].split("<br>")[0]) for pt in pts]
+    ps = []
+    for district in districts:
+        ps.append(html.P(district))
+
+
 initialize_left_side_functionality(app, df_lat_lon)
 initilize_right_side_functionality(app, df_full_data)
-
 
 if __name__ == "__main__":
     app.run_server(debug=True)

@@ -723,9 +723,9 @@ hr {
 /* Graph
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
 
-#graph-container {
+.tab {
     background-color: rgb(245, 245, 245);
-    padding: 5rem;
+    padding: 2rem;
     margin: 0;
     border-radius: 20px 20px 0px 0px;
 }
@@ -863,4 +863,17 @@ div, svg {
 
 ._dash-undo-redo {
     display: none;
+}
+
+#control-tabs {
+    width: 50%
+}
+
+.tab-content {
+    background-color: rgb(245, 245, 245);;
+}
+
+#selected-districts {
+    overflow: scroll;
+    height: 80rem;
 }
