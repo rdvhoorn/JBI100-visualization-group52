@@ -870,7 +870,9 @@ div, svg {
 }
 
 .tab-content {
-    background-color: rgb(245, 245, 245);;
+    background-color: rgb(245, 245, 245);
+    padding: 1rem;
+    min-height: 30rem;
 }
 
 #selected-districts {

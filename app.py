@@ -165,14 +165,20 @@ app.layout = html.Div(
                                     children=[
                                         html.Div(
                                             id="selected-districts",
+                                            className="tab-content"
                                         )
                                     ]
                                 ),
 
                                 dcc.Tab(
                                     label="General info",
-                                    id="general-info",
-                                    value="gen-info"
+                                    value="gen-info",
+                                    children=[
+                                        html.Div(
+                                            id="general-info",
+                                            className="tab-content"
+                                        )
+                                    ]
                                 )
                             ]
                         ),
@@ -219,6 +225,70 @@ def construct_general_info(selectedData, year):
     ps = []
     for district in districts:
         ps.append(html.P(district))
+
+    messages = []
+
+    dff = df_full_data[df_full_data["district_name"].isin(districts)]
+    dff = dff.sort_values("accident_year")
+
+    total_number_of_accidents_in_districts = dff.shape[0]
+    total_number_of_accidents = df_full_data.shape[0]
+    percentage_accidents = total_number_of_accidents_in_districts / (total_number_of_accidents / 100)
+
+    number_male_drivers_districts = dff[dff["sex_of_driver"] == 1].shape[0]
+    number_male_drivers = df_full_data[df_full_data["sex_of_driver"] == 1].shape[0]
+    percentage_male_districts = number_male_drivers_districts / (total_number_of_accidents_in_districts / 100)
+    percentage_male = number_male_drivers / (total_number_of_accidents / 100)
+
+    number_female_drivers_districts = dff[dff["sex_of_driver"] == 2].shape[0]
+    number_female_drivers = df_full_data[df_full_data["sex_of_driver"] == 2].shape[0]
+    percentage_female_districts = number_female_drivers_districts / (total_number_of_accidents_in_districts / 100)
+    percentage_female = number_female_drivers / (total_number_of_accidents / 100)
+
+    average_age_of_driver_district = dff['age_of_driver'].mean()
+    average_age_of_driver = df_full_data['age_of_driver'].mean()
+
+    average_age_of_car_district = dff['age_of_vehicle'].mean()
+    average_age_of_car = df_full_data['age_of_vehicle'].mean()
+
+
+    tab = html.Table(
+        children=[
+            html.Tr(children=[
+                html.Th(),
+                html.Th("Selected countries"),
+                html.Th("UK")
+            ]),
+            html.Tr(children=[
+                html.Td("Number of accidents"),
+                html.Td(str(total_number_of_accidents_in_districts) + " ({:.2f}%)".format(percentage_accidents)),
+                html.Td(total_number_of_accidents)
+            ]),
+            html.Tr(children=[
+                html.Td("Male driving during accident"),
+                html.Td("{:.2f}%".format(percentage_male_districts)),
+                html.Td("{:.2f}%".format(percentage_male))
+            ]),
+            html.Tr(children=[
+                html.Td("Female driving during accident"),
+                html.Td("{:.2f}%".format(percentage_female_districts)),
+                html.Td("{:.2f}%".format(percentage_female))
+            ]),
+            html.Tr(children=[
+                html.Td("Average age of driver in accident"),
+                html.Td("{:.2f}".format(average_age_of_driver_district)),
+                html.Td("{:.2f}".format(average_age_of_driver))
+            ]),
+            html.Tr(children=[
+                html.Td("Average age of car in accident"),
+                html.Td("{:.2f}".format(average_age_of_car_district)),
+                html.Td("{:.2f}".format(average_age_of_car))
+            ])
+        ])
+
+    messages.append(tab)
+
+    return messages
 
 
 initialize_left_side_functionality(app, df_lat_lon)
