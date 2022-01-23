@@ -7,13 +7,18 @@ def initilize_right_side_functionality(app, df_full_data):
     @app.callback(
         Output("selected-data", "figure"),
         [
-            Input("county-choropleth", "selectedData"),
+            Input("selected-districts", "children"),
             Input("chart-dropdown", "value"),
             Input("years-slider", "value"),
         ],
     )
-    def display_selected_data(selectedData, chart_dropdown, year):
-        if selectedData is None:
+    def display_selected_data(district_list, chart_dropdown, year):
+        districts = []
+        for district in district_list:
+            if "lasso tool" not in district['props']['children']:
+                districts.append(district['props']['children'])
+
+        if len(districts) == 0:
             return dict(
                 data=[dict(x=0, y=0)],
                 layout=dict(
@@ -26,9 +31,7 @@ def initilize_right_side_functionality(app, df_full_data):
             )
 
         # Select all data of the counties that were included in the lasso
-        pts = selectedData["points"]
-        counties = [str(pt["text"].split("<br>")[0]) for pt in pts]
-        dff = df_full_data[df_full_data["district_name"].isin(counties)]
+        dff = df_full_data[df_full_data["district_name"].isin(districts)]
 
         # Sort data on accident year
         dff = dff.sort_values("accident_year")
@@ -86,7 +89,7 @@ def accidents_per_age(dff, year, df_full_data):
     # total UK data added - create the figure with total of UK shown as well
     fig = go.Figure()
     fig.add_trace(go.Bar(x=rate_per_age[AGGREGATE_BY], y=rate_per_age['count'],
-                name='Selected countries', marker_color=rate_per_age[AGGREGATE_BY2],
+                name='Selected districts', marker_color=rate_per_age[AGGREGATE_BY2],
                 ))
     fig.add_trace(go.Bar(x=rate_per_age_fulldata[AGGREGATE_BY], y=rate_per_age_fulldata['count'],
                 name='Total UK', marker_color=rate_per_age_fulldata[AGGREGATE_BY2]
@@ -211,7 +214,7 @@ def accidents_per_vehicle_age(dff, year, df_full_data):
     # total UK data added - create the figure with total of UK shown as well
     fig = go.Figure()
     fig.add_trace(go.Bar(x=rate_per_age[AGGREGATE_BY], y=rate_per_age['count'],
-                names='Selected countries',
+                names='Selected districts',
                 marker_color='rgb(26, 118, 255)'
                 ))
     fig.add_trace(go.Bar(x=rate_per_age_fulldata[AGGREGATE_BY], y=rate_per_age_fulldata['count'],
@@ -348,7 +351,7 @@ def accidents_per_time(dff, year, df_full_data):
     # total UK data added - create the figure with total of UK shown as well
     fig = go.Figure()
     fig.add_trace(go.Bar(x=rate_per_age[AGGREGATE_BY], y=rate_per_age['count'],
-                name='Selected countries', marker_color=rate_per_age[AGGREGATE_BY2],
+                name='Selected districts', marker_color=rate_per_age[AGGREGATE_BY2],
                 ))
     fig.add_trace(go.Bar(x=rate_per_age_fulldata[AGGREGATE_BY], y=rate_per_age_fulldata['count'],
                 name='Total UK', marker_color=rate_per_age_fulldata[AGGREGATE_BY2]
@@ -426,7 +429,7 @@ def accidents_per_propulsion_code(dff, year, df_full_data):
     # total UK data added - create the figure with total of UK shown as well
     fig = go.Figure()
     fig.add_trace(go.Bar(x=rate_per_age[AGGREGATE_BY], y=rate_per_age['count'],
-                name='Selected countries', marker_color=rate_per_age[AGGREGATE_BY2],
+                name='Selected districts', marker_color=rate_per_age[AGGREGATE_BY2],
                 ))
     fig.add_trace(go.Bar(x=rate_per_age_fulldata[AGGREGATE_BY], y=rate_per_age_fulldata['count'],
                 name='Total UK', marker_color=rate_per_age_fulldata[AGGREGATE_BY2]
@@ -504,7 +507,7 @@ def accidents_per_sex_of_driver(dff, year, df_full_data):
     # total UK data added - create the figure with total of UK shown as well
     fig = go.Figure()
     fig.add_trace(go.Bar(x=rate_per_age[AGGREGATE_BY], y=rate_per_age['count'],
-                name='Selected countries', marker_color=rate_per_age[AGGREGATE_BY2],
+                name='Selected districts', marker_color=rate_per_age[AGGREGATE_BY2],
                 ))
     fig.add_trace(go.Bar(x=rate_per_age_fulldata[AGGREGATE_BY], y=rate_per_age_fulldata['count'],
                 name='Total UK', marker_color=rate_per_age_fulldata[AGGREGATE_BY2]
@@ -580,7 +583,7 @@ def accidents_per_urban_or_rural_area(dff, year, df_full_data):
     # total UK data added - create the figure with total of UK shown as well
     fig = go.Figure()
     fig.add_trace(go.Bar(x=rate_per_age[AGGREGATE_BY], y=rate_per_age['count'],
-                name='Selected countries', marker_color=rate_per_age[AGGREGATE_BY2],
+                name='Selected districts', marker_color=rate_per_age[AGGREGATE_BY2],
                 ))
     fig.add_trace(go.Bar(x=rate_per_age_fulldata[AGGREGATE_BY], y=rate_per_age_fulldata['count'],
                 name='Total UK', marker_color=rate_per_age_fulldata[AGGREGATE_BY2]

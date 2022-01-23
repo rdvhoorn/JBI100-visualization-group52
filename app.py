@@ -175,13 +175,14 @@ app.layout = html.Div(
                                     children=[
                                         html.Div(
                                             children=[
-                                                dcc.Input(id='input', placeholder='Enter county', type="text"),
+                                                dcc.Input(id='input', placeholder='Enter district', type="text"),
                                                 html.Button('Add to list', id='add-button', n_clicks=0),
                                                 html.Button('Remove from list', id='remove-button', n_clicks=0),
                                             ]
                                         ),
                                         html.Div(
                                             id="selected-districts",
+                                            children=[]
                                         )
                                     ]
                                 ),
@@ -209,44 +210,56 @@ app.layout = html.Div(
 @app.callback(
     Output("selected-districts", "children"),
     [
+        Input("selected-districts", "children"),
         Input("county-choropleth", "selectedData"),
         Input('add-button', 'n_clicks'),
         Input('remove-button', 'n_clicks'),
     ],
     State('input', 'value')
 )
-def listSelectedDistricts(selectedData, n_clicks1, n_clicks2, value):
+def listSelectedDistricts(district_list, selectedData, n_clicks1, n_clicks2, value):
     default_return = [html.P("No districts are currently selected. Use the lasso tool to select districts")]
 
     changed_id = [p['prop_id'] for p in callback_context.triggered]
 
-    if selectedData is None or not selectedData["points"]:
-        if len(changed_id) == 1 and changed_id[0] == "add-button.n_clicks":
-            # add value to list
-            added_district = get_name_corresponding_district(value)
-            if added_district is not None:
-                return [html.P(added_district)]
+    if len(changed_id) == 1 and changed_id[0] == "county-choropleth.selectedData":
+        pts = selectedData["points"]
+        districts = [str(pt["text"].split("<br>")[0]) for pt in pts]
 
-        return default_return
+        if len(districts) == 0:
+            return default_return
+
+        ps = []
+        for district in districts:
+            ps.append(html.P(district))
+
+        return ps
 
 
-    pts = selectedData["points"]
-    districts = [str(pt["text"].split("<br>")[0]) for pt in pts]
+    districts_in_list = []
+    for district in district_list:
+        if "lasso tool" not in district['props']['children']:
+            districts_in_list.append(district['props']['children'])
 
     if len(changed_id) == 1 and changed_id[0] == "add-button.n_clicks":
+        # add value to list
         added_district = get_name_corresponding_district(value)
         if added_district is not None:
-            districts.append(added_district)
-    elif len(changed_id) == 1 and changed_id[0] == "remove-button.n_clicks":
+            districts_in_list.append(added_district)
+
+    if len(changed_id) == 1 and changed_id[0] == "remove-button.n_clicks":
         # remove value from list
         removed_district = get_name_corresponding_district(value)
         if removed_district is not None:
-            if removed_district in districts:
-                districts.remove(removed_district)
+            if removed_district in districts_in_list:
+                districts_in_list.remove(removed_district)
 
     ps = []
-    for district in districts:
+    for district in districts_in_list:
         ps.append(html.P(district))
+
+    if len(ps) == 0:
+        return default_return
 
     return ps
 
@@ -254,19 +267,18 @@ def listSelectedDistricts(selectedData, n_clicks1, n_clicks2, value):
 @app.callback(
     Output("general-info", "children"),
     [
-        Input("county-choropleth", "selectedData"),
+        Input("selected-districts", "children"),
         Input("years-slider", "value")
     ]
 )
-def construct_general_info(selectedData, year):
-    if selectedData is None or not selectedData["points"]:
-        return [html.P("No districts are currently selected. Use the lasso tool to select districts")]
+def construct_general_info(district_list, year):
+    districts = []
+    for district in district_list:
+        if "lasso tool" not in district['props']['children']:
+            districts.append(district['props']['children'])
 
-    pts = selectedData["points"]
-    districts = [str(pt["text"].split("<br>")[0]) for pt in pts]
-    ps = []
-    for district in districts:
-        ps.append(html.P(district))
+    if len(districts) == 0:
+        return [html.P("No districts are currently selected. Use the lasso tool to select districts")]
 
     messages = []
 
@@ -297,7 +309,7 @@ def construct_general_info(selectedData, year):
         children=[
             html.Tr(children=[
                 html.Th(),
-                html.Th("Selected countries"),
+                html.Th("Selected districts"),
                 html.Th("UK")
             ]),
             html.Tr(children=[

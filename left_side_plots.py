@@ -16,12 +16,12 @@ def initialize_left_side_functionality(app, df_lat_lon):
     @app.callback(
         Output("county-choropleth", "figure"),
         [
-            Input("county-choropleth", "selectedData"),
+            Input("selected-districts", "children"),
             Input("years-slider", "value"),
         ],
         [State("county-choropleth", "figure")],
     )
-    def display_map(selectedData, year, figure):
+    def display_map(district_list, year, figure):
         """
         This function generates what is shown on the map on the left side of the visualiztion
         :param year:    The year of the slider. if on 'sum', the value is '2021'
@@ -29,11 +29,10 @@ def initialize_left_side_functionality(app, df_lat_lon):
         :return:        The figure to be shown
         """
 
-        # Select all data of the counties that were included in the lasso
-        counties = None
-        if selectedData is not None:
-            pts = selectedData["points"]
-            counties = [str(pt["text"].split("<br>")[0]) for pt in pts]
+        districts = []
+        for district in district_list:
+            if "lasso tool" not in district['props']['children']:
+                districts.append(district['props']['children'])
 
         # Based on the year in the slider, a different variable of the dataset is shown. Here the name of that
         # variable is set.
@@ -54,7 +53,7 @@ def initialize_left_side_functionality(app, df_lat_lon):
 
             val = int((x / max) * max_val)
 
-            if counties is not None and county_name in counties:
+            if districts is not None and county_name in districts:
                 return rgb2hex(230, max_val - val, max_val - val)
 
             return rgb2hex(255, max_val - val, max_val - val)
