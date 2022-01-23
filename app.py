@@ -129,9 +129,8 @@ app.layout = html.Div(
                                         html.P(id="chart-selector", children="Select chart:"),
                                         dcc.Dropdown(
                                             options=[
-                                                {
-                                                    "label": "Accidents per age of driver",
-                                                    "value": "show_accidents_per_age",
+                                                {"label": "Accidents per age of driver",
+                                                 "value": "show_accidents_per_age",
                                                 },
                                                 {"label": "Accidents per age of vehicle",
                                                  "value": "show_accidents_per_vehicle_age",
@@ -262,7 +261,6 @@ def construct_general_info(selectedData, year):
 
     average_age_of_car_district = dff['age_of_vehicle'].mean()
     average_age_of_car = df_full_data['age_of_vehicle'].mean()
-
 
     tab = html.Table(
         children=[

@@ -4,3 +4,5 @@ cufflinks
 gunicorn
 numpy
 pandas
+colormap
+easydev

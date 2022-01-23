@@ -1,10 +1,5 @@
-from re import A
-from turtle import color
 import pandas as pd
 from dash.dependencies import Input, Output
-import cufflinks as cf
-from colormap import rgb2hex
-import json
 import plotly.express as px
 import plotly.graph_objects as go #for showing total & selected countries in same barchart
 
