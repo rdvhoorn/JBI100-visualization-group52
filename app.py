@@ -4,8 +4,7 @@ import re
 import random
 
 import dash
-from dash import html
-from dash import dcc
+from dash import html, dcc, callback_context
 import pandas as pd
 import cufflinks as cf
 from dash.dependencies import Input, Output, State
@@ -131,7 +130,7 @@ app.layout = html.Div(
                                             options=[
                                                 {"label": "Accidents per age of driver",
                                                  "value": "show_accidents_per_age",
-                                                },
+                                                 },
                                                 {"label": "Accidents per age of vehicle",
                                                  "value": "show_accidents_per_vehicle_age",
                                                  },
@@ -175,6 +174,13 @@ app.layout = html.Div(
                                     className="tab",
                                     children=[
                                         html.Div(
+                                            children=[
+                                                dcc.Input(id='input', placeholder='Enter county', type="text"),
+                                                html.Button('Add to list', id='add-button', n_clicks=0),
+                                                html.Button('Remove from list', id='remove-button', n_clicks=0),
+                                            ]
+                                        ),
+                                        html.Div(
                                             id="selected-districts",
                                         )
                                     ]
@@ -204,14 +210,40 @@ app.layout = html.Div(
     Output("selected-districts", "children"),
     [
         Input("county-choropleth", "selectedData"),
-    ]
+        Input('add-button', 'n_clicks'),
+        Input('remove-button', 'n_clicks'),
+    ],
+    State('input', 'value')
 )
-def listSelectedDistricts(selectedData):
+def listSelectedDistricts(selectedData, n_clicks1, n_clicks2, value):
+    default_return = [html.P("No districts are currently selected. Use the lasso tool to select districts")]
+
+    changed_id = [p['prop_id'] for p in callback_context.triggered]
+
     if selectedData is None or not selectedData["points"]:
-        return [html.P("No districts are currently selected. Use the lasso tool to select districts")]
+        if len(changed_id) == 1 and changed_id[0] == "add-button.n_clicks":
+            # add value to list
+            added_district = get_name_corresponding_district(value)
+            if added_district is not None:
+                return [html.P(added_district)]
+
+        return default_return
+
 
     pts = selectedData["points"]
     districts = [str(pt["text"].split("<br>")[0]) for pt in pts]
+
+    if len(changed_id) == 1 and changed_id[0] == "add-button.n_clicks":
+        added_district = get_name_corresponding_district(value)
+        if added_district is not None:
+            districts.append(added_district)
+    elif len(changed_id) == 1 and changed_id[0] == "remove-button.n_clicks":
+        # remove value from list
+        removed_district = get_name_corresponding_district(value)
+        if removed_district is not None:
+            if removed_district in districts:
+                districts.remove(removed_district)
+
     ps = []
     for district in districts:
         ps.append(html.P(district))
@@ -299,6 +331,13 @@ def construct_general_info(selectedData, year):
 
     return messages
 
+
+def get_name_corresponding_district(value: str):
+    for district in df_full_data["district_name"].unique():
+        if value in district:
+            return district
+
+    return None
 
 initialize_left_side_functionality(app, df_lat_lon)
 initilize_right_side_functionality(app, df_full_data)
