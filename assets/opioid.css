@@ -1,42 +1,6 @@
 @import url('https://fonts.googleapis.com/css?family=Open+Sans');
 @import url('https://fonts.googleapis.com/css?family=Playfair+Display');
 
-/* Table of contents
-––––––––––––––––––––––––––––––––––––––––––––––––––
-- Plotly.js
-- Grid
-- Base Styles
-- Typography
-- Links
-- Buttons
-- Forms
-- Lists
-- Code
-- Tables
-- Spacing
-- Utilities
-- Clearing
-- Media Queries
-*/
-
-/* PLotly.js
-–––––––––––––––––––––––––––––––––––––––––––––––––– */
-/* plotly.js's modebar's z-index is 1001 by default
- * https://github.com/plotly/plotly.js/blob/7e4d8ab164258f6bd48be56589dacd9bdd7fded2/src/css/_modebar.scss#L5
- * In case a dropdown is above the graph, the dropdown's options
- * will be rendered below the modebar
- * Increase the select option's z-index
- */
-
-/* This was actually not quite right -
-   dropdowns were overlapping each other (edited October 26)
-
-.Select {
-    z-index: 1002;
-}*/
-
-/* Grid
-–––––––––––––––––––––––––––––––––––––––––––––––––– */
 .container {
     position: relative;
     width: 100%;
@@ -61,163 +25,8 @@
     }
 }
 
-/* For devices larger than 550px */
-@media (min-width: 550px) {
-    .container {
-        width: 80%;
-    }
-
-    .column,
-    .columns {
-        margin-left: 4%;
-    }
-
-    .column:first-child,
-    .columns:first-child {
-        margin-left: 0;
-    }
-
-    .one.column,
-    .one.columns {
-        width: 4.66666666667%;
-    }
-
-    .two.columns {
-        width: 13.3333333333%;
-    }
-
-    .three.columns {
-        width: 22%;
-    }
-
-    .four.columns {
-        width: 30.6666666667%;
-    }
-
-    .five.columns {
-        width: 39.3333333333%;
-    }
-
-    .six.columns {
-        width: 48%;
-    }
-
-    .seven.columns {
-        width: 56.6666666667%;
-    }
-
-    .eight.columns {
-        width: 65.3333333333%;
-    }
-
-    .nine.columns {
-        width: 74.0%;
-    }
-
-    .ten.columns {
-        width: 82.6666666667%;
-    }
-
-    .eleven.columns {
-        width: 91.3333333333%;
-    }
-
-    .twelve.columns {
-        width: 100%;
-        margin-left: 0;
-    }
-
-    .one-third.column {
-        width: 30.6666666667%;
-    }
-
-    .two-thirds.column {
-        width: 65.3333333333%;
-    }
-
-    .one-half.column {
-        width: 48%;
-    }
-
-    /* Offsets */
-    .offset-by-one.column,
-    .offset-by-one.columns {
-        margin-left: 8.66666666667%;
-    }
-
-    .offset-by-two.column,
-    .offset-by-two.columns {
-        margin-left: 17.3333333333%;
-    }
-
-    .offset-by-three.column,
-    .offset-by-three.columns {
-        margin-left: 26%;
-    }
-
-    .offset-by-four.column,
-    .offset-by-four.columns {
-        margin-left: 34.6666666667%;
-    }
-
-    .offset-by-five.column,
-    .offset-by-five.columns {
-        margin-left: 43.3333333333%;
-    }
-
-    .offset-by-six.column,
-    .offset-by-six.columns {
-        margin-left: 52%;
-    }
-
-    .offset-by-seven.column,
-    .offset-by-seven.columns {
-        margin-left: 60.6666666667%;
-    }
-
-    .offset-by-eight.column,
-    .offset-by-eight.columns {
-        margin-left: 69.3333333333%;
-    }
-
-    .offset-by-nine.column,
-    .offset-by-nine.columns {
-        margin-left: 78.0%;
-    }
-
-    .offset-by-ten.column,
-    .offset-by-ten.columns {
-        margin-left: 86.6666666667%;
-    }
-
-    .offset-by-eleven.column,
-    .offset-by-eleven.columns {
-        margin-left: 95.3333333333%;
-    }
-
-    .offset-by-one-third.column,
-    .offset-by-one-third.columns {
-        margin-left: 34.6666666667%;
-    }
-
-    .offset-by-two-thirds.column,
-    .offset-by-two-thirds.columns {
-        margin-left: 69.3333333333%;
-    }
-
-    .offset-by-one-half.column,
-    .offset-by-one-half.columns {
-        margin-left: 52%;
-    }
-
-}
-
-
 /* Base Styles
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
-/* NOTE
-html is set to 62.5% so that all the REM measurements throughout Skeleton
-are based on 10px sizing. So basically 1.5rem = 15px :) */
 html {
     font-size: 50%;
     background-color: rgb(254, 254, 254);
@@ -345,18 +154,6 @@ p {
         font-size: 1rem;
     }
 }
-
-
-/* Blockquotes
-–––––––––––––––––––––––––––––––––––––––––––––––––– */
-blockquote {
-    border-left: 4px lightgrey solid;
-    padding-left: 1rem;
-    margin-top: 2rem;
-    margin-bottom: 2rem;
-    margin-left: 0;
-}
-
 
 /* Links
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
@@ -647,6 +444,8 @@ hr {
     padding: 2rem 6rem 4rem 4rem;
     height: 8rem;
     border-radius: 20px 20px 0px 0px;
+    -webkit-box-shadow: 1px 1px 3px rgba(0,0,0,0.4);
+    -moz-box-shadow: 1px 1px 3px rgba(0,0,0,0.4);
 }
 
 .rc-slider-dot-active, .rc-slider-handle {
@@ -668,8 +467,10 @@ hr {
 /* Heatmap
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
 #heatmap-container {
-    margin: 2.5rem 0 0 0;
+    margin: 2.5rem 0 1rem 0;
     background-color: rgb(245, 245, 245);
+    -webkit-box-shadow: 1px 1px 3px rgba(0,0,0,0.4);
+    -moz-box-shadow: 1px 1px 3px rgba(0,0,0,0.4);
 }
 
 #heatmap-title {
@@ -728,6 +529,8 @@ hr {
     padding: 2rem;
     margin: 0;
     border-radius: 20px 20px 0px 0px;
+    -webkit-box-shadow: 1px 1px 3px rgba(0,0,0,0.4);
+    -moz-box-shadow: 1px 1px 3px rgba(0,0,0,0.4);
 }
 
 @media (max-width: 1250px) {
@@ -865,6 +668,11 @@ div, svg {
     display: none;
 }
 
+.tab-content {
+    -webkit-box-shadow: 1px 1px 3px rgba(0,0,0,0.4);
+    -moz-box-shadow: 1px 1px 3px rgba(0,0,0,0.4);
+}
+
 #control-tabs {
     width: 50%
 }
@@ -873,6 +681,12 @@ div, svg {
     background-color: rgb(245, 245, 245);
     padding: 1rem;
     min-height: 30rem;
+}
+
+
+
+.tab--selected {
+    background-color: rgb(245, 245, 245);
 }
 
 #selected-districts {

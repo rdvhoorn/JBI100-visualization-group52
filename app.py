@@ -176,7 +176,6 @@ app.layout = html.Div(
                                     children=[
                                         html.Div(
                                             id="selected-districts",
-                                            className="tab-content"
                                         )
                                     ]
                                 ),
@@ -184,10 +183,10 @@ app.layout = html.Div(
                                 dcc.Tab(
                                     label="General info",
                                     value="gen-info",
+                                    className="tab",
                                     children=[
                                         html.Div(
                                             id="general-info",
-                                            className="tab-content"
                                         )
                                     ]
                                 )
