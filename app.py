@@ -30,7 +30,7 @@ server = app.server
 APP_PATH = str(pathlib.Path(__file__).parent.resolve())
 
 df_lat_lon = pd.read_csv(
-    os.path.join(APP_PATH, os.path.join("data", "lat_lon_counties_uk.csv"))
+    os.path.join(APP_PATH, os.path.join("data", "lat_lon_districts_uk.csv"))
 )
 
 df_full_data = pd.read_csv(
