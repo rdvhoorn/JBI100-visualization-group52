@@ -149,10 +149,24 @@ app.layout = html.Div(
                                                 {"label": "Accidents per urban or rural area",
                                                  "value": "show_accidents_per_urban_or_rural_area",
                                                  },
+                                                {"label": "Accidents per left- or righthand driver",
+                                                 "value": "show_accidents_per_left_right_hand",
+                                                 },
                                             ],
                                             value="show_accidents_per_age",
                                             id="chart-dropdown",
                                         ),
+                                        html.P(id="avUK_radio_item", children="Show graph of total UK to compare:"),
+                                        dcc.RadioItems(
+                                            options=[
+                                                {'label': 'Yes', 'value':'yes'},
+                                                {'label': 'No', 'value':'no'}
+                                            ],
+                                            value='no',
+                                            id='avUK',
+                                            labelStyle={'display': 'inline-block'}
+                                        ),
+
                                         dcc.Graph(
                                             id="selected-data",
                                             figure=dict(
@@ -352,7 +366,7 @@ def get_name_corresponding_district(value: str):
     return None
 
 initialize_left_side_functionality(app, df_lat_lon)
-initilize_right_side_functionality(app, df_full_data)
+initilize_right_side_functionality(app, df_full_data, df_lat_lon)
 
 if __name__ == "__main__":
     app.run_server(debug=True)
