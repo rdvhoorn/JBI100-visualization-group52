@@ -86,9 +86,9 @@ def accidents_per_age(dff, year, df_full_data, avUK, district_ratio, UK_ratio):
     This function generates the right side figure displaying accidents per age
     """
     if year == 2021:
-        title = "Accidents per age of driver for 2016-2020"
+        title = "Accidents per age of driver for 2016-2020 per 100.000 people"
     else: 
-        title = "Accidents per age of driver for {0}".format(year)
+        title = "Accidents per age of driver for {0} per 100.000 people".format(year)
 
     AGGREGATE_BY = "age_of_driver"
     AGGREGATE_BY2 = "accident_severity"
@@ -259,9 +259,9 @@ def accidents_per_vehicle_age(dff, year, df_full_data, avUK, district_ratio, UK_
     This function generates the right side figure displaying accidents per age
     """
     if year == 2021:
-        title = "Accidents per age of vehicle for 2016-2020"   
+        title = "Accidents per age of vehicle for 2016-2020 per 100.000 people"   
     else: 
-        title = "Accidents per age of vehicle for {0}".format(year)
+        title = "Accidents per age of vehicle for {0} per 100.000 people".format(year)
 
     AGGREGATE_BY = "age_of_vehicle"
     AGGREGATE_BY2 = "accident_severity"
@@ -360,9 +360,9 @@ def accidents_per_engine_capacity(dff, year, df_full_data, avUK, district_ratio,
     This function generates the right side figure displaying accidents per engine capacity
     """
     if year == 2021:
-        title = "Accidents per engine capacity for 2016-2020"
+        title = "Accidents per engine capacity for 2016-2020 per 100.000 people"
     else: 
-        title = "Accidents per engine capacity for {0}".format(year)
+        title = "Accidents per engine capacity for {0} per 100.000 people".format(year)
     
     AGGREGATE_BY = "engine_capacity_cc"
     AGGREGATE_BY2 = "accident_severity"
@@ -432,9 +432,9 @@ def accidents_per_time(dff, year, df_full_data, avUK, district_ratio, UK_ratio):
     This function generates the right side figure displaying accidents per time of day
     """
     if year == 2021:
-        title = "Accidents per time of day for 2016-2020"
+        title = "Accidents per time of day for 2016-2020 per 100.000 people"
     else: 
-        title = "Accidents per time of day for {0}".format(year)
+        title = "Accidents per time of day for {0} per 100.000 people".format(year)
 
     AGGREGATE_BY = "time"
     AGGREGATE_BY2 = "accident_severity"
@@ -538,9 +538,9 @@ def accidents_per_propulsion_code(dff, year, df_full_data, avUK, district_ratio,
     This function generates the right side figure displaying accidents per propulsion code
     """
     if year == 2021:
-        title = "Accidents per propulsion code for 2016-2020"
+        title = "Accidents per propulsion code for 2016-2020 per 100.000 people"
     else: 
-        title = "Accidents per propulsion code for {0}".format(year)
+        title = "Accidents per propulsion code for {0} per 100.000 people".format(year)
 
     AGGREGATE_BY = "propulsion_code"
     AGGREGATE_BY2 = "accident_severity"
@@ -635,9 +635,9 @@ def accidents_per_sex_of_driver(dff, year, df_full_data, avUK, district_ratio, U
     This function generates the right side figure displaying accidents per sex of driver
     """
     if year == 2021:
-        title = "Accidents per sex of driver for 2016-2020"
+        title = "Accidents per sex of driver for 2016-2020 per 100.000 people"
     else: 
-        title = "Accidents per sex of driver for {0}".format(year)
+        title = "Accidents per sex of driver for {0} per 100.000 people".format(year)
 
     AGGREGATE_BY = "sex_of_driver"
     AGGREGATE_BY2 = "accident_severity"
@@ -731,9 +731,9 @@ def accidents_per_urban_or_rural_area(dff, year, df_full_data, avUK, district_ra
     This function generates the right side figure displaying accidents per urban or rural area
     """
     if year == 2021:
-        title = "Accidents per urban or rural area for 2016-2020"
+        title = "Accidents per urban or rural area for 2016-2020 per 100.000 people"
     else: 
-        title = "Accidents per urban or rural area for {0}".format(year)
+        title = "Accidents per urban or rural area for {0} per 100.000 people".format(year)
 
     AGGREGATE_BY = "urban_or_rural_area"
     AGGREGATE_BY2 = "accident_severity"
@@ -829,9 +829,9 @@ def accidents_per_left_right_hand(dff, year, df_full_data, avUK, district_ratio,
     This function generates the right side figure displaying accidents per left- or righthand driver
     """
     if year == 2021:
-        title = "Accidents per left- or righthand driver for 2016-2020"
+        title = "Accidents per left- or righthand driver for 2016-2020 per 100.000 people"
     else: 
-        title = "Accidents per left- or righthand driver for {0}".format(year)
+        title = "Accidents per left- or righthand driver for {0} per 100.000 people".format(year)
 
     AGGREGATE_BY = "vehicle_left_hand_drive"
     AGGREGATE_BY2 = "accident_severity"
