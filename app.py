@@ -39,9 +39,6 @@ df_full_data = pd.read_csv(
     )
 )
 
-# Dont remove 2021, it is the 'sum' year
-YEARS = [2016, 2017, 2018, 2019, 2020, 2021]
-
 mapbox_access_token = "pk.eyJ1IjoicnZkaG9vcm4iLCJhIjoiY2t3eGVtbGNrMGRwNzJ3bnJucWp4emoweiJ9.5P0vCt-6KnIubabETLsymA"
 mapbox_style = "mapbox://styles/rvdhoorn/ckx1u7m3v3k0o14pam2buej1s"
 
@@ -61,7 +58,7 @@ app.layout = html.Div(
                 html.Div(
                     id="left-column",
                     children=[
-                        html.Div(
+                        html.Div( # contains the explanation and drop-down menu
                             id="slider-container",
                             children=[
                                 html.Div(
@@ -106,7 +103,7 @@ app.layout = html.Div(
 
                             ],
                         ),
-                        html.Div(
+                        html.Div( # contains the chloropleth map
                             id="heatmap-container",
                             children=[
                                 html.P(

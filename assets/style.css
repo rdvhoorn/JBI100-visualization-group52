@@ -1,0 +1,380 @@
+@import url('https://fonts.googleapis.com/css?family=Open+Sans');
+@import url('https://fonts.googleapis.com/css?family=Playfair+Display');
+
+.container {
+    position: relative;
+    width: 100%;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 20px;
+    box-sizing: border-box;
+}
+
+.column,
+.columns {
+    width: 100%;
+    float: left;
+    box-sizing: border-box;
+}
+
+/* For devices larger than 400px */
+@media (min-width: 400px) and (max-width: 549px) {
+    .container {
+        width: 85%;
+        padding: 0;
+    }
+}
+
+html {
+    font-size: 50%;
+    background-color: rgb(254, 254, 254);
+    max-width: 100% !important;
+    width: 100% !important;
+    margin: 0;
+}
+
+body {
+    font-size: 1.5rem; /* currently ems cause chrome bug misinterpreting rems on body element */
+    line-height: 1.6;
+    font-weight: 400;
+    font-family: "Open Sans", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    color: #000000;
+    margin: 0;
+}
+
+#root {
+    margin: 0;
+}
+
+@media (max-width: 550px) {
+    #root {
+        padding: 2rem;
+    }
+}
+
+@media (min-width: 551px) {
+    #root {
+        padding: 2rem 5rem 0 5rem;
+    }
+}
+
+h4 {
+    margin-top: 0;
+    margin-bottom: 0;
+    font-weight: 300;
+}
+h4 {
+    font-family: "Playfair Display", sans-serif;
+    font-size: 4rem;
+    line-height: 1.35;
+    letter-spacing: -.08rem;
+    margin-bottom: 1.2rem;
+    margin-top: 1.2rem;
+}
+
+p {
+    margin-top: 0;
+}
+
+#heatmap-title {
+    font-family: "Playfair Display", sans-serif;
+    font-size: 2rem;
+}
+
+#description {
+    font-size: 1.5rem;
+    border-left: #000000 solid 1rem;
+    padding-left: 1rem;
+    max-width: 100rem;
+    margin: 2rem 0 3rem 0;
+}
+
+#logo {
+    height: 5rem;
+    margin-bottom: 2rem;
+}
+
+#slider-text, #chart-selector {
+    margin-bottom: 2rem !important;
+    font-size: 2rem;
+}
+
+
+@media only screen and (max-width: 550px) {
+    .rc-slider-mark-text {
+        font-size: 50%;
+    }
+
+    #description {
+        font-size: 1rem;
+    }
+}
+
+a {
+    color: #1EAEDB;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+a:hover {
+    color: #0FA0CE;
+}
+
+table {
+    border-collapse: collapse;
+}
+
+th,
+td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #E1E1E1;
+}
+
+th:first-child,
+td:first-child {
+    padding-left: 0;
+}
+
+th:last-child,
+td:last-child {
+    padding-right: 0;
+}
+
+#slider-container {
+    background-color: rgb(245, 245, 245);
+    padding: 2rem 6rem 4rem 4rem;
+    height: 12rem;
+    border-radius: 20px 20px 0px 0px;
+    -webkit-box-shadow: 1px 1px 3px rgba(0,0,0,0.4);
+    -moz-box-shadow: 1px 1px 3px rgba(0,0,0,0.4);
+}
+
+#heatmap-container {
+    margin: 2.5rem 0 1rem 0;
+    background-color: rgb(245, 245, 245);
+    -webkit-box-shadow: 1px 1px 3px rgba(0,0,0,0.4);
+    -moz-box-shadow: 1px 1px 3px rgba(0,0,0,0.4);
+}
+
+#heatmap-title {
+    margin: 0;
+    padding: 1rem;
+}
+
+#county-choropleth {
+    margin: 0;
+    flex-grow: 1;
+}
+
+@media (min-width: 1251px) {
+    #heatmap-container {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+    }
+}
+
+@media (max-width: 550px) {
+    #county-choropleth .annotation-text{
+        font-size: 1.2rem !important;
+    }
+}
+
+@media only screen and (max-width: 1250px) {
+    /*For mobile and smaller screens*/
+    #left-column {
+        margin-right: 1.5%;
+        width: 100%;
+    }
+}
+
+@media (min-width: 1251px) {
+    /*For desktop*/
+    #left-column {
+        margin-right: 1.5%;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-content: center;
+        flex: 6 60%;
+    }
+}
+
+.tab {
+    background-color: rgb(245, 245, 245);
+    padding: 2rem;
+    margin: 0;
+    border-radius: 20px 20px 0px 0px;
+    -webkit-box-shadow: 1px 1px 3px rgba(0,0,0,0.4);
+    -moz-box-shadow: 1px 1px 3px rgba(0,0,0,0.4);
+}
+
+@media (max-width: 1250px) {
+    /*For mobile and smaller screens*/
+    #header h4 {
+        text-align: center;
+    }
+
+    #graph-container {
+        margin-top: 5rem;
+    }
+
+    #selected-data {
+        height: 55rem;
+    }
+}
+
+@media (min-width: 1251px) {
+    /*For desktop*/
+    #logo {
+        float: right;
+        padding-right: 2rem;
+    }
+
+    #header p {
+        font-size: 1.5rem;
+    }
+
+    #graph-container {
+        flex: 4 40%;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        justify-content: flex-start;
+    }
+
+    #selected-data {
+        flex-grow: 1;
+    }
+}
+
+@media (max-width: 550px) {
+    #graph-container {
+        padding: 2.5rem;
+    }
+
+    #selected-data .xtick text{
+        font-size: 1.1rem !important;
+    }
+
+    #selected-data .gtitle{
+        font-size: 1.7rem !important;
+    }
+}
+
+
+#chart-dropdown {
+    margin-bottom: 6.6rem;
+}
+
+.Select-value {
+    cursor: pointer;
+}
+
+.Select-control {
+    color: #000 !important;
+}
+
+.Select {
+    color: #000 !important;
+}
+
+.Select-menu-outer {
+    background-color: #252e3f !important;
+    border: 1px solid #000 !important;
+}
+
+.Select div {
+    background-color: #fff !important;
+}
+
+.Select-menu-outer div:hover {
+    background-color: rgba(255, 255, 255, 0.01) !important;
+    cursor: pointer;
+}
+
+.Select-value-label {
+    color: #000 !important;
+}
+
+.Select--single > .Select-control .Select-value, .Select-placeholder {
+    border: 1px solid #000 !important;
+    border-radius: 4px !important;
+}
+
+@media only screen and (max-width: 1250px) {
+    /*For mobile and smaller screens*/
+    #app-container {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: stretch;
+    }
+}
+
+@media (min-width: 1251px) {
+    /*For desktop*/
+    #app-container {
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-start;
+        align-items: stretch;
+        height: 100rem;
+    }
+}
+
+#header {
+    margin-left: 1.5%;
+}
+
+
+div, svg {
+    user-select: none !important;
+}
+
+._dash-undo-redo {
+    display: none;
+}
+
+.tab-content {
+    -webkit-box-shadow: 1px 1px 3px rgba(0,0,0,0.4);
+    -moz-box-shadow: 1px 1px 3px rgba(0,0,0,0.4);
+}
+
+#control-tabs {
+    width: 50%
+}
+
+.tab-content {
+    background-color: rgb(245, 245, 245);
+    padding: 1rem;
+    min-height: 30rem;
+}
+
+
+
+.tab--selected {
+    background-color: rgb(245, 245, 245);
+}
+
+#selected-districts {
+    overflow: scroll;
+    height: 80rem;
+}
+
+#dropdown-div {
+    width: 20%;
+    display: inline-block;
+    float: right;
+}
+
+#explanation-div {
+    width: 70%;
+    display: inline-block;
+    float: left;
+    margin-right: 50px
+}
