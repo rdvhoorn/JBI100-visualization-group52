@@ -149,8 +149,7 @@ def accidents_per_vehicle_age(dff, year, df_full_data, avUK, district_ratio, UK_
     rate_per_age = dff.groupby([AGGREGATE_BY, AGGREGATE_BY2], as_index=False).count()
     rate_per_age.rename(columns={"accident_index": "count"}, inplace=True)
     rate_per_age.reset_index()
-    rate_per_age = rate_per_age[
-        rate_per_age[AGGREGATE_BY] < 41]  # remove above 40, because data points are so low, the bars dont show
+    rate_per_age = rate_per_age[rate_per_age[AGGREGATE_BY] < 41]  # remove above 40, because data points are so low, the bars dont show
     rate_per_age.drop([0, 1, 2], inplace=True)
     rate_per_age['count'] = (rate_per_age['count'] / district_ratio)
     rate_per_age['accident_severity'] = rate_per_age['accident_severity'].replace([1, 2, 3],
@@ -214,8 +213,7 @@ def accidents_per_engine_capacity(dff, year, df_full_data, avUK, district_ratio,
     rate_per_age = dff.groupby([AGGREGATE_BY, AGGREGATE_BY2], as_index=False).count()
     rate_per_age.rename(columns={"accident_index": "count"}, inplace=True)
     rate_per_age.reset_index()
-    rate_per_age = rate_per_age[
-        rate_per_age[AGGREGATE_BY] < 8001]  # remove above 8000, because data points are so low, the bars dont show
+    rate_per_age = rate_per_age[rate_per_age[AGGREGATE_BY] < 8001]  # remove above 8000, because data points are so low, the bars dont show
     rate_per_age.drop([0, 1, 2], inplace=True)
     rate_per_age['count'] = (rate_per_age['count'] / district_ratio)
     rate_per_age['accident_severity'] = rate_per_age['accident_severity'].replace([1, 2, 3],
@@ -249,7 +247,7 @@ def accidents_per_engine_capacity(dff, year, df_full_data, avUK, district_ratio,
     if avUK == "no":
         fig = px.histogram(rate_per_age, x=AGGREGATE_BY, y="count", color=AGGREGATE_BY2, title=title,
                            color_discrete_map=color_discrete_map,
-                           category_orders={"accident_severity": ["Severe", "Moderate", "Light"]}, nbins=80)
+                           category_orders={"accident_severity": ["Severe", "Moderate", "Light"]}, nbins=40)
 
     fig.update_layout(xaxis_title="Engine capacity (cc)")
     fig.update_layout(yaxis_title="Number of accidents")
