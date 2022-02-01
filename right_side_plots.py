@@ -279,7 +279,7 @@ def accidents_per_time(dff, year, df_full_data, avUK, district_ratio, UK_ratio):
 
     # data selected countries
     dff[AGGREGATE_BY] = dff[AGGREGATE_BY].str.slice(0, 2)  # change from (HH:MM) to (HH), for bin sizes
-    dff[AGGREGATE_BY] = pd.to_numeric(dff[AGGREGATE_BY], errors="coerce")
+    #dff[AGGREGATE_BY] = pd.to_numeric(dff[AGGREGATE_BY], errors="coerce")
     dff = dff[["accident_index", AGGREGATE_BY, AGGREGATE_BY2]]
     rate_per_age = dff.groupby([AGGREGATE_BY, AGGREGATE_BY2], as_index=False).count()
     rate_per_age.rename(columns={"accident_index": "count"}, inplace=True)
@@ -287,19 +287,19 @@ def accidents_per_time(dff, year, df_full_data, avUK, district_ratio, UK_ratio):
     rate_per_age['count'] = (rate_per_age['count'] / district_ratio)
     # rate_per_age.drop([0,1,2], inplace=True)
 
-    rate_per_age[AGGREGATE_BY] = rate_per_age[AGGREGATE_BY].replace(
+    rate_per_age_2 = rate_per_age.copy()
+    rate_per_age_2[AGGREGATE_BY] = rate_per_age_2[AGGREGATE_BY].replace(
         [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24],
         x_labels)  # correct x label values
-    rate_per_age['accident_severity'] = rate_per_age['accident_severity'].replace([1, 2, 3],
+    rate_per_age_2['accident_severity'] = rate_per_age_2['accident_severity'].replace([1, 2, 3],
                                                                                   ["Light", "Moderate", "Severe"])
 
     color_discrete_map = {'Light': '#FFC400', 'Moderate': '#FF7700', 'Severe': '#FF0000'}
 
     if avUK == "yes":
         # total UK data added - add data description
-        df_full_data[AGGREGATE_BY] = df_full_data[AGGREGATE_BY].str.slice(0,
-                                                                          2)  # change from (HH:MM) to (HH), for bin sizes
-        df_full_data[AGGREGATE_BY] = pd.to_numeric(df_full_data[AGGREGATE_BY], errors="coerce")
+        df_full_data[AGGREGATE_BY] = df_full_data[AGGREGATE_BY].str.slice(0,2)  # change from (HH:MM) to (HH), for bin sizes
+        #df_full_data[AGGREGATE_BY] = pd.to_numeric(df_full_data[AGGREGATE_BY], errors="coerce")
         df_full_data = df_full_data[["accident_index", AGGREGATE_BY, AGGREGATE_BY2]]
         rate_per_age_fulldata = df_full_data.groupby([AGGREGATE_BY, AGGREGATE_BY2], as_index=False).count()
         rate_per_age_fulldata.rename(columns={"accident_index": "count"}, inplace=True)
@@ -307,23 +307,24 @@ def accidents_per_time(dff, year, df_full_data, avUK, district_ratio, UK_ratio):
         rate_per_age_fulldata['count'] = (rate_per_age_fulldata['count'] / UK_ratio)
         color_discrete_map = {'Light': '#FFC400', 'Moderate': '#FF7700', 'Severe': '#FF0000'}
 
-        rate_per_age_fulldata[AGGREGATE_BY] = rate_per_age_fulldata[AGGREGATE_BY].replace(
+        rate_per_age_fulldata_2 = rate_per_age_fulldata.copy()
+        rate_per_age_fulldata_2[AGGREGATE_BY] = rate_per_age_fulldata_2[AGGREGATE_BY].replace(
             [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24],
             x_labels)  # correct x label values
-        rate_per_age_fulldata['accident_severity'] = rate_per_age_fulldata['accident_severity'].replace([1, 2, 3],
+        rate_per_age_fulldata_2['accident_severity'] = rate_per_age_fulldata_2['accident_severity'].replace([1, 2, 3],
                                                                                                         ["Light",
                                                                                                          "Moderate",
                                                                                                          "Severe"])
         fig = go.Figure()
-        fig.add_trace(go.Bar(x=rate_per_age[AGGREGATE_BY], y=rate_per_age['count'],
+        fig.add_trace(go.Bar(x=rate_per_age_2[AGGREGATE_BY], y=rate_per_age_2['count'],
                              name='Selected districts', marker_color="blue",
                              ))
-        fig.add_trace(go.Bar(x=rate_per_age_fulldata[AGGREGATE_BY], y=rate_per_age_fulldata['count'],
+        fig.add_trace(go.Bar(x=rate_per_age_fulldata_2[AGGREGATE_BY], y=rate_per_age_fulldata_2['count'],
                              name='Total UK', marker_color="red"
                              ))
 
     if avUK == "no":
-        fig = px.bar(rate_per_age, x=AGGREGATE_BY, y="count", color=AGGREGATE_BY2, title=title,
+        fig = px.bar(rate_per_age_2, x=AGGREGATE_BY, y="count", color=AGGREGATE_BY2, title=title,
                      color_discrete_map=color_discrete_map,
                      category_orders={"accident_severity": ["Severe", "Moderate", "Light"]})
 
