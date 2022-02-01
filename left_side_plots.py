@@ -17,14 +17,14 @@ def initialize_left_side_functionality(app, df_lat_lon):
         Output("county-choropleth", "figure"),
         [
             Input("selected-districts", "children"),
-            Input("years-slider", "value"),
+            Input("years-dropdown", "value")
         ],
         [State("county-choropleth", "figure")],
     )
     def display_map(district_list, year, figure):
         """
         This function generates what is shown on the map on the left side of the visualiztion
-        :param year:    The year of the slider. if on 'sum', the value is '2021'
+        :param year:    The year of the dropdown.
         :param figure:
         :return:        The figure to be shown
         """
@@ -36,9 +36,10 @@ def initialize_left_side_functionality(app, df_lat_lon):
 
         # Based on the year in the slider, a different variable of the dataset is shown. Here the name of that
         # variable is set.
-        variable_name = "number_of_accidents_" + str(year)
-        if year == 2021:
+        if year == 'sum':
             variable_name = "number_of_accidents"
+        else:
+            variable_name = "number_of_accidents_" + str(year)
 
         def color(x, max, county_name):
             """
@@ -77,7 +78,7 @@ def initialize_left_side_functionality(app, df_lat_lon):
         # Make up hover text
         hover_text_df = df_lat_lon["Hover"].to_frame()
         title = "Number of Accidents"
-        if year != 2021:
+        if year != 'sum':
             title += " in " + str(year) + ": "
         else:
             title += ": "
@@ -168,9 +169,9 @@ def initialize_left_side_functionality(app, df_lat_lon):
         fig = dict(data=data, layout=layout)
         return fig
 
-    @app.callback(Output("heatmap-title", "children"), [Input("years-slider", "value")])
+    @app.callback(Output("heatmap-title", "children"), [Input("years-dropdown", "value")])
     def update_map_title(year):
-        if year == 2021:
+        if year == 'sum':
             return "heatmap of population adjusted accident rate of last 5 years"
 
         return "Heatmap of population adjusted accident rate per district for {0}".format(year)

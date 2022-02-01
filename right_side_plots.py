@@ -10,7 +10,7 @@ def initilize_right_side_functionality(app, df_full_data, df_lat_lon):
         [
             Input("selected-districts", "children"),
             Input("chart-dropdown", "value"),
-            Input("years-slider", "value"),
+            Input("years-dropdown", "value"),
             Input("avUK", "value")
         ],
     )
@@ -85,7 +85,7 @@ def accidents_per_age(dff, year, df_full_data, avUK, district_ratio, UK_ratio):
     """
     This function generates the right side figure displaying accidents per age
     """
-    if year == 2021:
+    if year == 'sum':
         title = "Accidents per age of driver for 2016-2020 per 100.000 people"
     else: 
         title = "Accidents per age of driver for {0} per 100.000 people".format(year)
@@ -258,7 +258,7 @@ def accidents_per_vehicle_age(dff, year, df_full_data, avUK, district_ratio, UK_
     """
     This function generates the right side figure displaying accidents per age
     """
-    if year == 2021:
+    if year == 'sum':
         title = "Accidents per age of vehicle for 2016-2020 per 100.000 people"   
     else: 
         title = "Accidents per age of vehicle for {0} per 100.000 people".format(year)
@@ -359,7 +359,7 @@ def accidents_per_engine_capacity(dff, year, df_full_data, avUK, district_ratio,
     """
     This function generates the right side figure displaying accidents per engine capacity
     """
-    if year == 2021:
+    if year == 'sum':
         title = "Accidents per engine capacity for 2016-2020 per 100.000 people"
     else: 
         title = "Accidents per engine capacity for {0} per 100.000 people".format(year)
@@ -431,7 +431,7 @@ def accidents_per_time(dff, year, df_full_data, avUK, district_ratio, UK_ratio):
     """
     This function generates the right side figure displaying accidents per time of day
     """
-    if year == 2021:
+    if year == 'sum':
         title = "Accidents per time of day for 2016-2020 per 100.000 people"
     else: 
         title = "Accidents per time of day for {0} per 100.000 people".format(year)
@@ -537,7 +537,7 @@ def accidents_per_propulsion_code(dff, year, df_full_data, avUK, district_ratio,
     """
     This function generates the right side figure displaying accidents per propulsion code
     """
-    if year == 2021:
+    if year == 'sum':
         title = "Accidents per propulsion code for 2016-2020 per 100.000 people"
     else: 
         title = "Accidents per propulsion code for {0} per 100.000 people".format(year)
@@ -634,7 +634,7 @@ def accidents_per_sex_of_driver(dff, year, df_full_data, avUK, district_ratio, U
     """
     This function generates the right side figure displaying accidents per sex of driver
     """
-    if year == 2021:
+    if year == 'sum':
         title = "Accidents per sex of driver for 2016-2020 per 100.000 people"
     else: 
         title = "Accidents per sex of driver for {0} per 100.000 people".format(year)
@@ -730,7 +730,7 @@ def accidents_per_urban_or_rural_area(dff, year, df_full_data, avUK, district_ra
     """
     This function generates the right side figure displaying accidents per urban or rural area
     """
-    if year == 2021:
+    if year == 'sum':
         title = "Accidents per urban or rural area for 2016-2020 per 100.000 people"
     else: 
         title = "Accidents per urban or rural area for {0} per 100.000 people".format(year)
@@ -828,7 +828,7 @@ def accidents_per_left_right_hand(dff, year, df_full_data, avUK, district_ratio,
     """
     This function generates the right side figure displaying accidents per left- or righthand driver
     """
-    if year == 2021:
+    if year == 'sum':
         title = "Accidents per left- or righthand driver for 2016-2020 per 100.000 people"
     else: 
         title = "Accidents per left- or righthand driver for {0} per 100.000 people".format(year)

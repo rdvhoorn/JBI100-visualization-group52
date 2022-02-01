@@ -442,7 +442,7 @@ hr {
 #slider-container {
     background-color: rgb(245, 245, 245);
     padding: 2rem 6rem 4rem 4rem;
-    height: 8rem;
+    height: 10rem;
     border-radius: 20px 20px 0px 0px;
     -webkit-box-shadow: 1px 1px 3px rgba(0,0,0,0.4);
     -moz-box-shadow: 1px 1px 3px rgba(0,0,0,0.4);
@@ -692,4 +692,17 @@ div, svg {
 #selected-districts {
     overflow: scroll;
     height: 80rem;
+}
+
+#dropdown-div {
+    width: 20%;
+    display: inline-block;
+    float: right;
+}
+
+#explanation-div {
+    width: 70%;
+    display: inline-block;
+    float: left;
+    margin-right: 50px
 }

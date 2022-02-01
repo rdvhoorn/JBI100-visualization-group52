@@ -64,23 +64,46 @@ app.layout = html.Div(
                         html.Div(
                             id="slider-container",
                             children=[
-                                html.P(
-                                    id="slider-text",
-                                    children="Drag the slider to change the year:",
+                                html.Div(
+                                    id="explanation-div",
+                                    children=[
+                                        html.P(
+                                            children=[
+                                                "This visualization tool is to help ensurance companies to explore " +
+                                                "information about acr accidents in the UK on a wide scale. Through "
+                                                "using this tool, districts can be found that might differ from the "
+                                                "average UK values for certain metrics which can prompt futher "
+                                                "in-depth investigation. First, select a year to inspect in the dropdown"
+                                                " to the right of this text (or 'Aggregate' for the aggregation of all data)."
+                                                " You can look at the data that appears on the map now! You can use the "
+                                                "lasso tool to select a set of districts which will upon selecting show"
+                                                " various graphs on the right-hand side."]
+                                        )
+                                    ]
                                 ),
-                                dcc.Slider(
-                                    id="years-slider",
-                                    min=min(YEARS),
-                                    max=max(YEARS),
-                                    value=min(YEARS),
-                                    marks={  # Here the labels of the slider are set, so 2021 is changed to 'sum'
-                                        str(year): {
-                                            "label": "sum" if year == 2021 else str(year),
-                                            "style": {"color": "#000"},
-                                        }
-                                        for year in YEARS
-                                    },
+                                html.Div(
+                                    id="dropdown-div",
+                                    children=[
+                                        html.P(
+                                            id="dropdown-text",
+                                            children="Select the year of interest:",
+                                        ),
+                                        dcc.Dropdown(
+                                            id="years-dropdown",
+                                            options=[
+                                                {'label': '2016', 'value': 2016},
+                                                {'label': '2017', 'value': 2017},
+                                                {'label': '2018', 'value': 2018},
+                                                {'label': '2019', 'value': 2019},
+                                                {'label': '2020', 'value': 2020},
+                                                {'label': 'Aggregate', 'value': 'sum'},
+                                            ],
+                                            value='2016',
+                                            clearable=False
+                                        )
+                                    ]
                                 ),
+
                             ],
                         ),
                         html.Div(
@@ -159,8 +182,8 @@ app.layout = html.Div(
                                         html.P(id="avUK_radio_item", children="Show graph of total UK to compare:"),
                                         dcc.RadioItems(
                                             options=[
-                                                {'label': 'Yes', 'value':'yes'},
-                                                {'label': 'No', 'value':'no'}
+                                                {'label': 'Yes', 'value': 'yes'},
+                                                {'label': 'No', 'value': 'no'}
                                             ],
                                             value='no',
                                             id='avUK',
@@ -249,7 +272,6 @@ def listSelectedDistricts(district_list, selectedData, n_clicks1, n_clicks2, val
 
         return ps
 
-
     districts_in_list = []
     for district in district_list:
         if "lasso tool" not in district['props']['children']:
@@ -282,7 +304,7 @@ def listSelectedDistricts(district_list, selectedData, n_clicks1, n_clicks2, val
     Output("general-info", "children"),
     [
         Input("selected-districts", "children"),
-        Input("years-slider", "value")
+        Input("years-dropdown", "value")
     ]
 )
 def construct_general_info(district_list, year):
@@ -364,6 +386,7 @@ def get_name_corresponding_district(value: str):
             return district
 
     return None
+
 
 initialize_left_side_functionality(app, df_lat_lon)
 initilize_right_side_functionality(app, df_full_data, df_lat_lon)
