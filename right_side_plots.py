@@ -48,26 +48,28 @@ def initialize_right_side_functionality(app, df_full_data, df_lat_lon):
 
         # Sort data on accident year
         dff = dff.sort_values("accident_year")
+        df_full = df_full_data.copy()
         if year != 'sum':
             dff = dff[dff["accident_year"] == int(year)]
+            df_full = df_full[df_full["accident_year"] == int(year)]
 
         # Generate graph based on dropdown.
         if chart_dropdown == "show_accidents_per_age":
-            return accidents_per_age(dff, year, df_full_data, av_uk, district_ratio, UK_ratio)
+            return accidents_per_age(dff, year, df_full, av_uk, district_ratio, UK_ratio)
         if chart_dropdown == "show_accidents_per_vehicle_age":
-            return accidents_per_vehicle_age(dff, year, df_full_data, av_uk, district_ratio, UK_ratio)
+            return accidents_per_vehicle_age(dff, year, df_full, av_uk, district_ratio, UK_ratio)
         if chart_dropdown == "show_accidents_per_engine_capacity":
-            return accidents_per_engine_capacity(dff, year, df_full_data, av_uk, district_ratio, UK_ratio)
+            return accidents_per_engine_capacity(dff, year, df_full, av_uk, district_ratio, UK_ratio)
         if chart_dropdown == "show_accidents_per_time":
-            return accidents_per_time(dff, year, df_full_data, av_uk, district_ratio, UK_ratio)
+            return accidents_per_time(dff, year, df_full, av_uk, district_ratio, UK_ratio)
         if chart_dropdown == "show_accidents_per_propulsion_code":
-            return accidents_per_propulsion_code(dff, year, df_full_data, av_uk, district_ratio, UK_ratio)
+            return accidents_per_propulsion_code(dff, year, df_full, av_uk, district_ratio, UK_ratio)
         if chart_dropdown == "show_accidents_per_sex_of_driver":
-            return accidents_per_sex_of_driver(dff, year, df_full_data, av_uk, district_ratio, UK_ratio)
+            return accidents_per_sex_of_driver(dff, year, df_full, av_uk, district_ratio, UK_ratio)
         if chart_dropdown == "show_accidents_per_urban_or_rural_area":
-            return accidents_per_urban_or_rural_area(dff, year, df_full_data, av_uk, district_ratio, UK_ratio)
+            return accidents_per_urban_or_rural_area(dff, year, df_full, av_uk, district_ratio, UK_ratio)
         if chart_dropdown == "show_accidents_per_left_right_hand":
-            return accidents_per_left_right_hand(dff, year, df_full_data, av_uk, district_ratio, UK_ratio)
+            return accidents_per_left_right_hand(dff, year, df_full, av_uk, district_ratio, UK_ratio)
 
 
 def accidents_per_age(dff, year, df_full_data, av_uk, district_ratio, uk_ratio):
@@ -124,6 +126,7 @@ def accidents_per_age(dff, year, df_full_data, av_uk, district_ratio, uk_ratio):
     fig.update_layout(xaxis_title="Age of driver (years)")
     fig.update_layout(yaxis_title="Number of accidents")
     fig.update_layout(legend_title_text='Accident Severity')
+    fig.update_layout(title=title)
 
     fig_layout = fig["layout"]
     fig_data = fig["data"]
@@ -191,6 +194,7 @@ def accidents_per_vehicle_age(dff, year, df_full_data, av_uk, district_ratio, uk
     fig.update_layout(xaxis_title="Age of vehicle (years)")
     fig.update_layout(yaxis_title="Number of accidents")
     fig.update_layout(legend_title_text='Accident Severity')
+    fig.update_layout(title=title)
 
     fig_layout = fig["layout"]
     fig_data = fig["data"]
@@ -256,6 +260,7 @@ def accidents_per_engine_capacity(dff, year, df_full_data, av_uk, district_ratio
     fig.update_layout(xaxis_title="Engine capacity (cc)")
     fig.update_layout(yaxis_title="Number of accidents")
     fig.update_layout(legend_title_text='Accident Severity')
+    fig.update_layout(title=title)
 
     fig_layout = fig["layout"]
     fig_data = fig["data"]
@@ -329,6 +334,7 @@ def accidents_per_time(dff, year, df_full_data, av_uk, district_ratio, uk_ratio)
     fig.update_layout(xaxis_title="Time of day (hours)")
     fig.update_layout(yaxis_title="Number of accidents")
     fig.update_layout(legend_title_text='Accident Severity')
+    fig.update_layout(title=title)
 
     fig_layout = fig["layout"]
     fig_data = fig["data"]
@@ -398,6 +404,7 @@ def accidents_per_propulsion_code(dff, year, df_full_data, av_uk, district_ratio
     fig.update_layout(xaxis_title="Propulsion code")
     fig.update_layout(yaxis_title="Number of accidents")
     fig.update_layout(legend_title_text='Accident Severity')
+    fig.update_layout(title=title)
 
     fig_layout = fig["layout"]
     fig_data = fig["data"]
@@ -464,6 +471,7 @@ def accidents_per_sex_of_driver(dff, year, df_full_data, av_uk, district_ratio, 
     fig.update_layout(xaxis_title="Sex of driver")
     fig.update_layout(yaxis_title="Number of accidents")
     fig.update_layout(legend_title_text='Accident Severity')
+    fig.update_layout(title=title)
 
     fig_layout = fig["layout"]
     fig_data = fig["data"]
@@ -528,6 +536,7 @@ def accidents_per_urban_or_rural_area(dff, year, df_full_data, av_uk, district_r
     fig.update_layout(xaxis_title="Urban or rural area")
     fig.update_layout(yaxis_title="Number of accidents")
     fig.update_layout(legend_title_text='Accident Severity')
+    fig.update_layout(title=title)
     fig_layout = fig["layout"]
     fig_data = fig["data"]
     fig_data[0]["textposition"] = "outside"
@@ -607,6 +616,7 @@ def accidents_per_left_right_hand(dff, year, df_full_data, av_uk, district_ratio
     fig.update_layout(xaxis_title="Left- or righthand driver")
     fig.update_layout(yaxis_title="Number of accidents")
     fig.update_layout(legend_title_text='Accident Severity')
+    fig.update_layout(title=title)
 
     fig_layout = fig["layout"]
     fig_data = fig["data"]

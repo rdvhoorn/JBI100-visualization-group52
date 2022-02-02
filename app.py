@@ -68,8 +68,8 @@ app.layout = html.Div(
                                     children=[
                                         html.P(
                                             children=[
-                                                "This visualization tool is to help ensurance companies to explore " +
-                                                "information about acr accidents in England on a wide scale. Through "
+                                                "This visualization tool is to help insurance companies to explore " +
+                                                "information about car accidents in England on a wide scale. Through "
                                                 "using this tool, districts can be found that might differ from the "
                                                 "average values for England for certain metrics which can prompt "
                                                 "further in-depth investigation. First, select a year to inspect in the"

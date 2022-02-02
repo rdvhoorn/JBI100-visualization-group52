@@ -89,8 +89,7 @@ def initialize_left_side_functionality(app, df_lat_lon):
         for feature in json_data['features']:
             county_name = feature['properties']["LAD13NM"]
             variable_number = feature['properties'][variable_name]
-
-            hover_text_df.loc[hover_text_df.Hover.str.contains(county_name)] += "<br>" + title + str(variable_number)
+            hover_text_df.loc[hover_text_df.Hover.str.split("<br>").str.get(0) == county_name] += "<br>" + title + str(variable_number)
 
         data = [
             dict(
