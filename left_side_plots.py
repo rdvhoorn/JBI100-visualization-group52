@@ -182,6 +182,6 @@ def initialize_left_side_functionality(app, df_lat_lon):
         :return:        The title of the figure
         """
         if year == 'sum':
-            return "heatmap of population adjusted accident rate of last 5 years"
+            return "Choropleth map of population adjusted accident rate of last 5 years"
 
-        return "Heatmap of population adjusted accident rate per district for {0}".format(year)
+        return "Choropleth map of population adjusted accident rate per district for {0}".format(year)
