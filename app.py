@@ -4,13 +4,14 @@ import re
 import random
 
 import dash
-from dash import html, dcc, callback_context
+from dash import html, dcc
 import pandas as pd
 import cufflinks as cf
-from dash.dependencies import Input, Output, State
 
-from right_side_plots import initilize_right_side_functionality
+
+from right_side_plots import initialize_right_side_functionality
 from left_side_plots import initialize_left_side_functionality
+from right_side_tabs import initialize_right_side_tabs_functionality
 
 r = lambda: random.randint(0, 255)
 
@@ -39,6 +40,7 @@ df_full_data = pd.read_csv(
     )
 )
 
+# Mapbox api access tokens and stylesheet for the choropleth map
 mapbox_access_token = "pk.eyJ1IjoicnZkaG9vcm4iLCJhIjoiY2t3eGVtbGNrMGRwNzJ3bnJucWp4emoweiJ9.5P0vCt-6KnIubabETLsymA"
 mapbox_style = "mapbox://styles/rvdhoorn/ckx1u7m3v3k0o14pam2buej1s"
 
@@ -58,7 +60,7 @@ app.layout = html.Div(
                 html.Div(
                     id="left-column",
                     children=[
-                        html.Div( # contains the explanation and drop-down menu
+                        html.Div(  # contains the explanation and drop-down menu
                             id="slider-container",
                             children=[
                                 html.Div(
@@ -69,12 +71,12 @@ app.layout = html.Div(
                                                 "This visualization tool is to help ensurance companies to explore " +
                                                 "information about acr accidents in the UK on a wide scale. Through "
                                                 "using this tool, districts can be found that might differ from the "
-                                                "average UK values for certain metrics which can prompt futher "
-                                                "in-depth investigation. First, select a year to inspect in the dropdown"
-                                                " to the right of this text (or 'Aggregate' for the aggregation of all data)."
-                                                " You can look at the data that appears on the map now! You can use the "
-                                                "lasso tool to select a set of districts which will upon selecting show"
-                                                " various graphs on the right-hand side."]
+                                                "average UK values for certain metrics which can prompt further "
+                                                "in-depth investigation. First, select a year to inspect in the "
+                                                "dropdown to the right of this text (or 'Aggregate' for the"
+                                                " aggregation of all data). You can look at the data that appears on "
+                                                "the map now! You can use the lasso tool to select a set of districts "
+                                                "which will upon selecting show various graphs on the right-hand side."]
                                         )
                                     ]
                                 ),
@@ -103,7 +105,7 @@ app.layout = html.Div(
 
                             ],
                         ),
-                        html.Div( # contains the chloropleth map
+                        html.Div(  # contains the choropleth map
                             id="heatmap-container",
                             children=[
                                 html.P(
@@ -135,12 +137,12 @@ app.layout = html.Div(
                 html.Div(
                     id='control-tabs',
                     className='control-tabs',
-                    children=[
+                    children=[  # Here the 3 different tabs are defined
                         dcc.Tabs(
                             id='tabs',
                             value='graphs',
                             children=[
-                                dcc.Tab(
+                                dcc.Tab(  # The first tab regards the graphs, and includes the dropdown as well.
                                     label="Graphs",
                                     className="tab",
                                     value='graphs',
@@ -202,7 +204,7 @@ app.layout = html.Div(
                                     ],
                                 ),
 
-                                dcc.Tab(
+                                dcc.Tab(  # Tab that shows selected districts and buttons for customization of that list
                                     label="Selected Districts",
                                     value="sel-dist",
                                     className="tab",
@@ -221,7 +223,7 @@ app.layout = html.Div(
                                     ]
                                 ),
 
-                                dcc.Tab(
+                                dcc.Tab(  # Tab showing general information (generated by callback)
                                     label="General info",
                                     value="gen-info",
                                     className="tab",
@@ -241,152 +243,10 @@ app.layout = html.Div(
 )
 
 
-@app.callback(
-    Output("selected-districts", "children"),
-    [
-        Input("selected-districts", "children"),
-        Input("county-choropleth", "selectedData"),
-        Input('add-button', 'n_clicks'),
-        Input('remove-button', 'n_clicks'),
-    ],
-    State('input', 'value')
-)
-def listSelectedDistricts(district_list, selectedData, n_clicks1, n_clicks2, value):
-    default_return = [html.P("No districts are currently selected. Use the lasso tool to select districts")]
-
-    changed_id = [p['prop_id'] for p in callback_context.triggered]
-
-    if len(changed_id) == 1 and changed_id[0] == "county-choropleth.selectedData":
-        pts = selectedData["points"]
-        districts = [str(pt["text"].split("<br>")[0]) for pt in pts]
-
-        if len(districts) == 0:
-            return default_return
-
-        ps = []
-        for district in districts:
-            ps.append(html.P(district))
-
-        return ps
-
-    districts_in_list = []
-    for district in district_list:
-        if "lasso tool" not in district['props']['children']:
-            districts_in_list.append(district['props']['children'])
-
-    if len(changed_id) == 1 and changed_id[0] == "add-button.n_clicks":
-        # add value to list
-        added_district = get_name_corresponding_district(value)
-        if added_district is not None:
-            districts_in_list.append(added_district)
-
-    if len(changed_id) == 1 and changed_id[0] == "remove-button.n_clicks":
-        # remove value from list
-        removed_district = get_name_corresponding_district(value)
-        if removed_district is not None:
-            if removed_district in districts_in_list:
-                districts_in_list.remove(removed_district)
-
-    ps = []
-    for district in districts_in_list:
-        ps.append(html.P(district))
-
-    if len(ps) == 0:
-        return default_return
-
-    return ps
-
-
-@app.callback(
-    Output("general-info", "children"),
-    [
-        Input("selected-districts", "children"),
-        Input("years-dropdown", "value")
-    ]
-)
-def construct_general_info(district_list, year):
-    districts = []
-    for district in district_list:
-        if "lasso tool" not in district['props']['children']:
-            districts.append(district['props']['children'])
-
-    if len(districts) == 0:
-        return [html.P("No districts are currently selected. Use the lasso tool to select districts")]
-
-    messages = []
-
-    dff = df_full_data[df_full_data["district_name"].isin(districts)]
-    dff = dff.sort_values("accident_year")
-
-    total_number_of_accidents_in_districts = dff.shape[0]
-    total_number_of_accidents = df_full_data.shape[0]
-    percentage_accidents = total_number_of_accidents_in_districts / (total_number_of_accidents / 100)
-
-    number_male_drivers_districts = dff[dff["sex_of_driver"] == 1].shape[0]
-    number_male_drivers = df_full_data[df_full_data["sex_of_driver"] == 1].shape[0]
-    percentage_male_districts = number_male_drivers_districts / (total_number_of_accidents_in_districts / 100)
-    percentage_male = number_male_drivers / (total_number_of_accidents / 100)
-
-    number_female_drivers_districts = dff[dff["sex_of_driver"] == 2].shape[0]
-    number_female_drivers = df_full_data[df_full_data["sex_of_driver"] == 2].shape[0]
-    percentage_female_districts = number_female_drivers_districts / (total_number_of_accidents_in_districts / 100)
-    percentage_female = number_female_drivers / (total_number_of_accidents / 100)
-
-    average_age_of_driver_district = dff['age_of_driver'].mean()
-    average_age_of_driver = df_full_data['age_of_driver'].mean()
-
-    average_age_of_car_district = dff['age_of_vehicle'].mean()
-    average_age_of_car = df_full_data['age_of_vehicle'].mean()
-
-    tab = html.Table(
-        children=[
-            html.Tr(children=[
-                html.Th(),
-                html.Th("Selected districts"),
-                html.Th("UK")
-            ]),
-            html.Tr(children=[
-                html.Td("Number of accidents"),
-                html.Td(str(total_number_of_accidents_in_districts) + " ({:.2f}%)".format(percentage_accidents)),
-                html.Td(total_number_of_accidents)
-            ]),
-            html.Tr(children=[
-                html.Td("Male driving during accident"),
-                html.Td("{:.2f}%".format(percentage_male_districts)),
-                html.Td("{:.2f}%".format(percentage_male))
-            ]),
-            html.Tr(children=[
-                html.Td("Female driving during accident"),
-                html.Td("{:.2f}%".format(percentage_female_districts)),
-                html.Td("{:.2f}%".format(percentage_female))
-            ]),
-            html.Tr(children=[
-                html.Td("Average age of driver in accident"),
-                html.Td("{:.2f}".format(average_age_of_driver_district)),
-                html.Td("{:.2f}".format(average_age_of_driver))
-            ]),
-            html.Tr(children=[
-                html.Td("Average age of car in accident"),
-                html.Td("{:.2f}".format(average_age_of_car_district)),
-                html.Td("{:.2f}".format(average_age_of_car))
-            ])
-        ])
-
-    messages.append(tab)
-
-    return messages
-
-
-def get_name_corresponding_district(value: str):
-    for district in df_full_data["district_name"].unique():
-        if value in district:
-            return district
-
-    return None
-
-
+# Various functions for initializing all callback functionalities
 initialize_left_side_functionality(app, df_lat_lon)
-initilize_right_side_functionality(app, df_full_data, df_lat_lon)
+initialize_right_side_functionality(app, df_full_data, df_lat_lon)
+initialize_right_side_tabs_functionality(app, df_full_data)
 
 if __name__ == "__main__":
     app.run_server(debug=True)

@@ -4,7 +4,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 
 
-def initilize_right_side_functionality(app, df_full_data, df_lat_lon):
+def initialize_right_side_functionality(app, df_full_data, df_lat_lon):
     @app.callback(
         Output("selected-data", "figure"),
         [
@@ -14,7 +14,7 @@ def initilize_right_side_functionality(app, df_full_data, df_lat_lon):
             Input("avUK", "value")
         ],
     )
-    def display_selected_data(district_list, chart_dropdown, year, avUK):
+    def display_selected_data(district_list, chart_dropdown, year, av_uk):
         districts = []
         for district in district_list:
             if "lasso tool" not in district['props']['children']:
@@ -48,38 +48,43 @@ def initilize_right_side_functionality(app, df_full_data, df_lat_lon):
 
         # Sort data on accident year
         dff = dff.sort_values("accident_year")
+        if year != 'sum':
+            dff = dff[dff["accident_year"] == int(year)]
 
+        # Generate graph based on dropdown.
         if chart_dropdown == "show_accidents_per_age":
-            return accidents_per_age(dff, year, df_full_data, avUK, district_ratio, UK_ratio)
+            return accidents_per_age(dff, year, df_full_data, av_uk, district_ratio, UK_ratio)
         if chart_dropdown == "show_accidents_per_vehicle_age":
-            return accidents_per_vehicle_age(dff, year, df_full_data, avUK, district_ratio, UK_ratio)
+            return accidents_per_vehicle_age(dff, year, df_full_data, av_uk, district_ratio, UK_ratio)
         if chart_dropdown == "show_accidents_per_engine_capacity":
-            return accidents_per_engine_capacity(dff, year, df_full_data, avUK, district_ratio, UK_ratio)
+            return accidents_per_engine_capacity(dff, year, df_full_data, av_uk, district_ratio, UK_ratio)
         if chart_dropdown == "show_accidents_per_time":
-            return accidents_per_time(dff, year, df_full_data, avUK, district_ratio, UK_ratio)
+            return accidents_per_time(dff, year, df_full_data, av_uk, district_ratio, UK_ratio)
         if chart_dropdown == "show_accidents_per_propulsion_code":
-            return accidents_per_propulsion_code(dff, year, df_full_data, avUK, district_ratio, UK_ratio)
+            return accidents_per_propulsion_code(dff, year, df_full_data, av_uk, district_ratio, UK_ratio)
         if chart_dropdown == "show_accidents_per_sex_of_driver":
-            return accidents_per_sex_of_driver(dff, year, df_full_data, avUK, district_ratio, UK_ratio)
+            return accidents_per_sex_of_driver(dff, year, df_full_data, av_uk, district_ratio, UK_ratio)
         if chart_dropdown == "show_accidents_per_urban_or_rural_area":
-            return accidents_per_urban_or_rural_area(dff, year, df_full_data, avUK, district_ratio, UK_ratio)
+            return accidents_per_urban_or_rural_area(dff, year, df_full_data, av_uk, district_ratio, UK_ratio)
         if chart_dropdown == "show_accidents_per_left_right_hand":
-            return accidents_per_left_right_hand(dff, year, df_full_data, avUK, district_ratio, UK_ratio)
+            return accidents_per_left_right_hand(dff, year, df_full_data, av_uk, district_ratio, UK_ratio)
 
 
-def accidents_per_age(dff, year, df_full_data, avUK, district_ratio, UK_ratio):
+def accidents_per_age(dff, year, df_full_data, av_uk, district_ratio, uk_ratio):
     """
     This function generates the right side figure displaying accidents per age
     """
+    # Set title
     if year == 'sum':
         title = "Accidents per age of driver for 2016-2020 per 100.000 people"
     else:
         title = "Accidents per age of driver for {0} per 100.000 people".format(year)
 
+    # Determine aggregation variables
     AGGREGATE_BY = "age_of_driver"
     AGGREGATE_BY2 = "accident_severity"
 
-    # data selected countries
+    # Edit dataset
     dff[AGGREGATE_BY] = pd.to_numeric(dff[AGGREGATE_BY], errors="coerce")
     dff = dff[["accident_index", AGGREGATE_BY, AGGREGATE_BY2]]
     rate_per_age = dff.groupby([AGGREGATE_BY, AGGREGATE_BY2], as_index=False).count()
@@ -91,30 +96,26 @@ def accidents_per_age(dff, year, df_full_data, avUK, district_ratio, UK_ratio):
                                                                                   ['Light', 'Moderate', 'Severe'])
     color_discrete_map = {'Light': '#FFC400', 'Moderate': '#FF7700', 'Severe': '#FF0000'}
 
-    if avUK == "yes":
+    # Depending on radiobutton, display with or without complete UK data next to it.
+    if av_uk == "yes":
         # total UK data added - add data description
         df_full_data[AGGREGATE_BY] = pd.to_numeric(df_full_data[AGGREGATE_BY], errors="coerce")
         df_full_data = df_full_data[["accident_index", AGGREGATE_BY, AGGREGATE_BY2]]
-        rate_per_age_fulldata = df_full_data.groupby([AGGREGATE_BY, AGGREGATE_BY2], as_index=False).count()
-        rate_per_age_fulldata.rename(columns={"accident_index": "count"}, inplace=True)
-        rate_per_age_fulldata.reset_index()
-        rate_per_age_fulldata.drop([0, 1, 2], inplace=True)
-        rate_per_age_fulldata['count'] = (rate_per_age_fulldata['count'] / UK_ratio)
-        rate_per_age_fulldata['accident_severity'] = rate_per_age_fulldata['accident_severity'].replace([1, 2, 3],
-                                                                                                        ['Light',
-                                                                                                         'Moderate',
-                                                                                                         'Severe'])
-        color_discrete_map = {'Light': '#FFC400', 'Moderate': '#FF7700', 'Severe': '#FF0000'}
+        rate_per_age_full_data = df_full_data.groupby([AGGREGATE_BY, AGGREGATE_BY2], as_index=False).count()
+        rate_per_age_full_data.rename(columns={"accident_index": "count"}, inplace=True)
+        rate_per_age_full_data.reset_index()
+        rate_per_age_full_data.drop([0, 1, 2], inplace=True)
+        rate_per_age_full_data['count'] = (rate_per_age_full_data['count'] / uk_ratio)
+        rate_per_age_full_data['accident_severity'] = \
+            rate_per_age_full_data['accident_severity'].replace([1, 2, 3], ['Light', 'Moderate', 'Severe'])
 
+        # Initialize figure
         fig = go.Figure()
         fig.add_trace(go.Bar(x=rate_per_age[AGGREGATE_BY], y=rate_per_age['count'],
-                             name='Selected districts', marker_color="blue",
-                             ))
-        fig.add_trace(go.Bar(x=rate_per_age_fulldata[AGGREGATE_BY], y=rate_per_age_fulldata['count'],
-                             name='Total UK', marker_color="red"
-                             ))
-
-    if avUK == "no":
+                             name='Selected districts', marker_color="blue"))
+        fig.add_trace(go.Bar(x=rate_per_age_full_data[AGGREGATE_BY], y=rate_per_age_full_data['count'],
+                             name='Total UK', marker_color="red"))
+    else:
         fig = px.bar(rate_per_age, x=AGGREGATE_BY, y="count", color=AGGREGATE_BY2, title=title,
                      color_discrete_map=color_discrete_map,
                      category_orders={"accident_severity": ["Severe", "Moderate", "Light"]})
@@ -127,60 +128,62 @@ def accidents_per_age(dff, year, df_full_data, avUK, district_ratio, UK_ratio):
     fig_layout = fig["layout"]
     fig_data = fig["data"]
 
-    fig_data, fig_layout = get_graph_layout(fig_layout, fig_data)
+    get_graph_layout(fig_layout, fig_data)
     return fig
 
 
-def accidents_per_vehicle_age(dff, year, df_full_data, avUK, district_ratio, UK_ratio):
+def accidents_per_vehicle_age(dff, year, df_full_data, av_uk, district_ratio, uk_ratio):
     """
     This function generates the right side figure displaying accidents per age
     """
+    # Initialize title for plot
     if year == 'sum':
         title = "Accidents per age of vehicle for 2016-2020 per 100.000 people"
     else:
         title = "Accidents per age of vehicle for {0} per 100.000 people".format(year)
 
+    # Determine aggregation variables
     AGGREGATE_BY = "age_of_vehicle"
     AGGREGATE_BY2 = "accident_severity"
 
     dff[AGGREGATE_BY] = pd.to_numeric(dff[AGGREGATE_BY], errors="coerce")
     dff = dff[["accident_index", AGGREGATE_BY, AGGREGATE_BY2]]
 
+    # Edit dataframe to correspond to data we want to output.
     rate_per_age = dff.groupby([AGGREGATE_BY, AGGREGATE_BY2], as_index=False).count()
     rate_per_age.rename(columns={"accident_index": "count"}, inplace=True)
     rate_per_age.reset_index()
-    rate_per_age = rate_per_age[rate_per_age[AGGREGATE_BY] < 41]  # remove above 40, because data points are so low, the bars dont show
+
+    # remove above 40, because data points are so low, the bars dont show
+    rate_per_age = rate_per_age[rate_per_age[AGGREGATE_BY] < 41]
     rate_per_age.drop([0, 1, 2], inplace=True)
     rate_per_age['count'] = (rate_per_age['count'] / district_ratio)
-    rate_per_age['accident_severity'] = rate_per_age['accident_severity'].replace([1, 2, 3],
-                                                                                  ['Light', 'Moderate', 'Severe'])
+    rate_per_age['accident_severity'] = rate_per_age['accident_severity'] \
+        .replace([1, 2, 3], ['Light', 'Moderate', 'Severe'])
     color_discrete_map = {'Light': '#FFC400', 'Moderate': '#FF7700', 'Severe': '#FF0000'}
 
-    if avUK == "yes":
+    # Depending on radiobutton, display with or without data of complete UK.
+    if av_uk == "yes":
         # total UK data added - add data description
         df_full_data[AGGREGATE_BY] = pd.to_numeric(df_full_data[AGGREGATE_BY], errors="coerce")
         df_full_data = df_full_data[["accident_index", AGGREGATE_BY, AGGREGATE_BY2]]
-        rate_per_age_fulldata = df_full_data.groupby([AGGREGATE_BY, AGGREGATE_BY2], as_index=False).count()
-        rate_per_age_fulldata.rename(columns={"accident_index": "count"}, inplace=True)
-        rate_per_age_fulldata.reset_index()
-        rate_per_age_fulldata = rate_per_age_fulldata[rate_per_age_fulldata[
-                                                          AGGREGATE_BY] < 41]  # remove above 40, because data points are so low, the bars dont show
-        rate_per_age_fulldata.drop([0, 1, 2], inplace=True)
-        rate_per_age_fulldata['count'] = (rate_per_age_fulldata['count'] / UK_ratio)
-        rate_per_age_fulldata['accident_severity'] = rate_per_age['accident_severity'].replace([1, 2, 3],
-                                                                                               ['Light', 'Moderate',
-                                                                                                'Severe'])
-        color_discrete_map = {'Light': '#FFC400', 'Moderate': '#FF7700', 'Severe': '#FF0000'}
+        rate_per_age_full_data = df_full_data.groupby([AGGREGATE_BY, AGGREGATE_BY2], as_index=False).count()
+        rate_per_age_full_data.rename(columns={"accident_index": "count"}, inplace=True)
+        rate_per_age_full_data.reset_index()
+
+        # remove above 40, because data points are so low, the bars dont show
+        rate_per_age_full_data = rate_per_age_full_data[rate_per_age_full_data[AGGREGATE_BY] < 41]
+        rate_per_age_full_data.drop([0, 1, 2], inplace=True)
+        rate_per_age_full_data['count'] = (rate_per_age_full_data['count'] / uk_ratio)
+        rate_per_age_full_data['accident_severity'] = rate_per_age['accident_severity'] \
+            .replace([1, 2, 3], ['Light', 'Moderate', 'Severe'])
 
         fig = go.Figure()
         fig.add_trace(go.Bar(x=rate_per_age[AGGREGATE_BY], y=rate_per_age['count'],
-                             name='Selected districts', marker_color="blue",
-                             ))
-        fig.add_trace(go.Bar(x=rate_per_age_fulldata[AGGREGATE_BY], y=rate_per_age_fulldata['count'],
-                             name='Total UK', marker_color="red"
-                             ))
-
-    if avUK == "no":
+                             name='Selected districts', marker_color="blue"))
+        fig.add_trace(go.Bar(x=rate_per_age_full_data[AGGREGATE_BY], y=rate_per_age_full_data['count'],
+                             name='Total UK', marker_color="red"))
+    else:
         fig = px.bar(rate_per_age, x=AGGREGATE_BY, y="count", color=AGGREGATE_BY2, title=title,
                      color_discrete_map=color_discrete_map,
                      category_orders={"accident_severity": ["Severe", "Moderate", "Light"]})
@@ -192,60 +195,61 @@ def accidents_per_vehicle_age(dff, year, df_full_data, avUK, district_ratio, UK_
     fig_layout = fig["layout"]
     fig_data = fig["data"]
 
-    fig_data, fig_layout = get_graph_layout(fig_layout, fig_data)
+    get_graph_layout(fig_layout, fig_data)
 
     return fig
 
 
-def accidents_per_engine_capacity(dff, year, df_full_data, avUK, district_ratio, UK_ratio):
+def accidents_per_engine_capacity(dff, year, df_full_data, av_uk, district_ratio, uk_ratio):
     """
     This function generates the right side figure displaying accidents per engine capacity
     """
+    # Determine title for plot
     if year == 'sum':
         title = "Accidents per engine capacity for 2016-2020 per 100.000 people"
     else:
         title = "Accidents per engine capacity for {0} per 100.000 people".format(year)
 
-    AGGREGATE_BY = "engine_capacity_cc"
-    AGGREGATE_BY2 = "accident_severity"
+    # Determine aggregation variables
+    aggregate_by = "engine_capacity_cc"
+    aggregate_by2 = "accident_severity"
 
-    dff = dff[["accident_index", AGGREGATE_BY, AGGREGATE_BY2]]
-    rate_per_age = dff.groupby([AGGREGATE_BY, AGGREGATE_BY2], as_index=False).count()
+    # Edit dataframe to correspond to data to be shown.
+    dff = dff[["accident_index", aggregate_by, aggregate_by2]]
+    rate_per_age = dff.groupby([aggregate_by, aggregate_by2], as_index=False).count()
     rate_per_age.rename(columns={"accident_index": "count"}, inplace=True)
     rate_per_age.reset_index()
-    rate_per_age = rate_per_age[rate_per_age[AGGREGATE_BY] < 8001]  # remove above 8000, because data points are so low, the bars dont show
+    rate_per_age = rate_per_age[
+        rate_per_age[aggregate_by] < 8001]  # remove above 8000, because data points are so low, the bars dont show
     rate_per_age.drop([0, 1, 2], inplace=True)
     rate_per_age['count'] = (rate_per_age['count'] / district_ratio)
-    rate_per_age['accident_severity'] = rate_per_age['accident_severity'].replace([1, 2, 3],
-                                                                                  ["Light", "Moderate", "Severe"])
+    rate_per_age['accident_severity'] = rate_per_age['accident_severity'] \
+        .replace([1, 2, 3], ["Light", "Moderate", "Severe"])
     color_discrete_map = {'Light': '#FFC400', 'Moderate': '#FF7700', 'Severe': '#FF0000'}
 
-    if avUK == "yes":
+    # Depending on radio button setting, show plot with or without data of complete UK.
+    if av_uk == "yes":
         # total UK data added - add data description
-        df_full_data[AGGREGATE_BY] = pd.to_numeric(df_full_data[AGGREGATE_BY], errors="coerce")
-        df_full_data = df_full_data[["accident_index", AGGREGATE_BY, AGGREGATE_BY2]]
-        rate_per_age_fulldata = df_full_data.groupby([AGGREGATE_BY, AGGREGATE_BY2], as_index=False).count()
-        rate_per_age_fulldata.rename(columns={"accident_index": "count"}, inplace=True)
-        rate_per_age_fulldata.reset_index()
+        df_full_data[aggregate_by] = pd.to_numeric(df_full_data[aggregate_by], errors="coerce")
+        df_full_data = df_full_data[["accident_index", aggregate_by, aggregate_by2]]
+        rate_per_age_full_data = df_full_data.groupby([aggregate_by, aggregate_by2], as_index=False).count()
+        rate_per_age_full_data.rename(columns={"accident_index": "count"}, inplace=True)
+        rate_per_age_full_data.reset_index()
         # remove above 8000, because data points are so low, the bars dont show
-        rate_per_age_fulldata = rate_per_age_fulldata[rate_per_age_fulldata[
-                                                          AGGREGATE_BY] < 8001]
-        rate_per_age_fulldata.drop([0, 1, 2], inplace=True)
-        rate_per_age_fulldata['count'] = (rate_per_age_fulldata['count'] / UK_ratio)
-        rate_per_age_fulldata["accident_severity"] = rate_per_age["accident_severity"].replace([1, 2, 3],
-                                                                                               ["Light", "Moderate",
-                                                                                                "Severe"])
+        rate_per_age_full_data = rate_per_age_full_data[rate_per_age_full_data[
+                                                          aggregate_by] < 8001]
+        rate_per_age_full_data.drop([0, 1, 2], inplace=True)
+        rate_per_age_full_data['count'] = (rate_per_age_full_data['count'] / uk_ratio)
+        rate_per_age_full_data["accident_severity"] = rate_per_age["accident_severity"] \
+            .replace([1, 2, 3], ["Light", "Moderate", "Severe"])
 
         fig = go.Figure()
-        fig.add_trace(go.Histogram(x=rate_per_age[AGGREGATE_BY], y=rate_per_age['count'],
-                                   name='Selected districts', marker_color="blue", nbinsx=20
-                                   ))
-        fig.add_trace(go.Histogram(x=rate_per_age_fulldata[AGGREGATE_BY], y=rate_per_age_fulldata['count'],
-                                   name='Total UK', marker_color="red", nbinsx=20
-                                   ))
-
-    if avUK == "no":
-        fig = px.histogram(rate_per_age, x=AGGREGATE_BY, y="count", color=AGGREGATE_BY2, title=title,
+        fig.add_trace(go.Histogram(x=rate_per_age[aggregate_by], y=rate_per_age['count'],
+                                   name='Selected districts', marker_color="blue", nbinsx=20))
+        fig.add_trace(go.Histogram(x=rate_per_age_full_data[aggregate_by], y=rate_per_age_full_data['count'],
+                                   name='Total UK', marker_color="red", nbinsx=20))
+    else:
+        fig = px.histogram(rate_per_age, x=aggregate_by, y="count", color=aggregate_by2, title=title,
                            color_discrete_map=color_discrete_map,
                            category_orders={"accident_severity": ["Severe", "Moderate", "Light"]}, nbins=40)
 
@@ -261,68 +265,63 @@ def accidents_per_engine_capacity(dff, year, df_full_data, avUK, district_ratio,
     return fig
 
 
-def accidents_per_time(dff, year, df_full_data, avUK, district_ratio, UK_ratio):
+def accidents_per_time(dff, year, df_full_data, av_uk, district_ratio, uk_ratio):
     """
     This function generates the right side figure displaying accidents per time of day
     """
+    # Determine plot title
     if year == 'sum':
         title = "Accidents per time of day for 2016-2020 per 100.000 people"
     else:
         title = "Accidents per time of day for {0} per 100.000 people".format(year)
 
-    AGGREGATE_BY = "time"
-    AGGREGATE_BY2 = "accident_severity"
+    # Determine aggregation variables
+    aggregate_by = "time"
+    aggregate_by2 = "accident_severity"
     x_labels = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17',
                 '18', '19', '20', '21', '22', '23', '24']
 
     # data selected countries
-    dff[AGGREGATE_BY] = dff[AGGREGATE_BY].str.slice(0, 2)  # change from (HH:MM) to (HH), for bin sizes
-    #dff[AGGREGATE_BY] = pd.to_numeric(dff[AGGREGATE_BY], errors="coerce")
-    dff = dff[["accident_index", AGGREGATE_BY, AGGREGATE_BY2]]
-    rate_per_age = dff.groupby([AGGREGATE_BY, AGGREGATE_BY2], as_index=False).count()
+    dff[aggregate_by] = dff[aggregate_by].str.slice(0, 2)  # change from (HH:MM) to (HH), for bin sizes
+    dff = dff[["accident_index", aggregate_by, aggregate_by2]]
+    rate_per_age = dff.groupby([aggregate_by, aggregate_by2], as_index=False).count()
     rate_per_age.rename(columns={"accident_index": "count"}, inplace=True)
     rate_per_age.reset_index()
     rate_per_age['count'] = (rate_per_age['count'] / district_ratio)
-    # rate_per_age.drop([0,1,2], inplace=True)
 
     rate_per_age_2 = rate_per_age.copy()
-    rate_per_age_2[AGGREGATE_BY] = rate_per_age_2[AGGREGATE_BY].replace(
-        [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24],
-        x_labels)  # correct x label values
-    rate_per_age_2['accident_severity'] = rate_per_age_2['accident_severity'].replace([1, 2, 3],
-                                                                                  ["Light", "Moderate", "Severe"])
+    # correct x label values
+    rate_per_age_2[aggregate_by] = rate_per_age_2[aggregate_by].replace(
+        [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24], x_labels)
+    rate_per_age_2['accident_severity'] = rate_per_age_2['accident_severity'] \
+        .replace([1, 2, 3], ["Light", "Moderate", "Severe"])
 
     color_discrete_map = {'Light': '#FFC400', 'Moderate': '#FF7700', 'Severe': '#FF0000'}
 
-    if avUK == "yes":
+    # Depending on state of radio button, show plot with or without complete data of UK
+    if av_uk == "yes":
         # total UK data added - add data description
-        df_full_data[AGGREGATE_BY] = df_full_data[AGGREGATE_BY].str.slice(0,2)  # change from (HH:MM) to (HH), for bin sizes
-        #df_full_data[AGGREGATE_BY] = pd.to_numeric(df_full_data[AGGREGATE_BY], errors="coerce")
-        df_full_data = df_full_data[["accident_index", AGGREGATE_BY, AGGREGATE_BY2]]
-        rate_per_age_fulldata = df_full_data.groupby([AGGREGATE_BY, AGGREGATE_BY2], as_index=False).count()
-        rate_per_age_fulldata.rename(columns={"accident_index": "count"}, inplace=True)
-        rate_per_age_fulldata.reset_index()
-        rate_per_age_fulldata['count'] = (rate_per_age_fulldata['count'] / UK_ratio)
-        color_discrete_map = {'Light': '#FFC400', 'Moderate': '#FF7700', 'Severe': '#FF0000'}
+        df_full_data[aggregate_by] = df_full_data[aggregate_by].str.slice(0, 2)
+        df_full_data = df_full_data[["accident_index", aggregate_by, aggregate_by2]]
+        rate_per_age_full_data = df_full_data.groupby([aggregate_by, aggregate_by2], as_index=False).count()
+        rate_per_age_full_data.rename(columns={"accident_index": "count"}, inplace=True)
+        rate_per_age_full_data.reset_index()
+        rate_per_age_full_data['count'] = (rate_per_age_full_data['count'] / uk_ratio)
 
-        rate_per_age_fulldata_2 = rate_per_age_fulldata.copy()
-        rate_per_age_fulldata_2[AGGREGATE_BY] = rate_per_age_fulldata_2[AGGREGATE_BY].replace(
+        rate_per_age_full_data_2 = rate_per_age_full_data.copy()
+        rate_per_age_full_data_2[aggregate_by] = rate_per_age_full_data_2[aggregate_by].replace(
             [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24],
             x_labels)  # correct x label values
-        rate_per_age_fulldata_2['accident_severity'] = rate_per_age_fulldata_2['accident_severity'].replace([1, 2, 3],
-                                                                                                        ["Light",
-                                                                                                         "Moderate",
-                                                                                                         "Severe"])
-        fig = go.Figure()
-        fig.add_trace(go.Bar(x=rate_per_age_2[AGGREGATE_BY], y=rate_per_age_2['count'],
-                             name='Selected districts', marker_color="blue",
-                             ))
-        fig.add_trace(go.Bar(x=rate_per_age_fulldata_2[AGGREGATE_BY], y=rate_per_age_fulldata_2['count'],
-                             name='Total UK', marker_color="red"
-                             ))
+        rate_per_age_full_data_2['accident_severity'] = rate_per_age_full_data_2['accident_severity'] \
+            .replace([1, 2, 3], ["Light", "Moderate", "Severe"])
 
-    if avUK == "no":
-        fig = px.bar(rate_per_age_2, x=AGGREGATE_BY, y="count", color=AGGREGATE_BY2, title=title,
+        fig = go.Figure()
+        fig.add_trace(go.Bar(x=rate_per_age_2[aggregate_by], y=rate_per_age_2['count'],
+                             name='Selected districts', marker_color="blue"))
+        fig.add_trace(go.Bar(x=rate_per_age_full_data_2[aggregate_by], y=rate_per_age_full_data_2['count'],
+                             name='Total UK', marker_color="red"))
+    else:
+        fig = px.bar(rate_per_age_2, x=aggregate_by, y="count", color=aggregate_by2, title=title,
                      color_discrete_map=color_discrete_map,
                      category_orders={"accident_severity": ["Severe", "Moderate", "Light"]})
 
@@ -334,66 +333,64 @@ def accidents_per_time(dff, year, df_full_data, avUK, district_ratio, UK_ratio):
     fig_layout = fig["layout"]
     fig_data = fig["data"]
 
-    fig_data, fig_layout = get_graph_layout(fig_layout, fig_data)
+    get_graph_layout(fig_layout, fig_data)
 
     return fig
 
 
-def accidents_per_propulsion_code(dff, year, df_full_data, avUK, district_ratio, UK_ratio):
+def accidents_per_propulsion_code(dff, year, df_full_data, av_uk, district_ratio, uk_ratio):
     """
     This function generates the right side figure displaying accidents per propulsion code
     """
+    # Determine title of plot
     if year == 'sum':
         title = "Accidents per propulsion code for 2016-2020 per 100.000 people"
     else:
         title = "Accidents per propulsion code for {0} per 100.000 people".format(year)
 
-    AGGREGATE_BY = "propulsion_code"
-    AGGREGATE_BY2 = "accident_severity"
+    aggregate_by = "propulsion_code"
+    aggregate_by2 = "accident_severity"
     x_labels = ['Petrol', 'Heavy oil', 'Electric', 'Steam', 'Gas', 'Petrol/Gas (LPG)', 'Gas/Bi-fuel', 'Hybrid electric',
                 'Gas Diesel', 'New fuel technology', 'Fuel cells', 'Electric diesel']
 
-    # data selected countries
-    dff[AGGREGATE_BY] = pd.to_numeric(dff[AGGREGATE_BY], errors="coerce")
-    dff = dff[["accident_index", AGGREGATE_BY, AGGREGATE_BY2]]
-    rate_per_age = dff.groupby([AGGREGATE_BY, AGGREGATE_BY2], as_index=False).count()
+    # Edit dataframe as preparation for plot
+    dff[aggregate_by] = pd.to_numeric(dff[aggregate_by], errors="coerce")
+    dff = dff[["accident_index", aggregate_by, aggregate_by2]]
+    rate_per_age = dff.groupby([aggregate_by, aggregate_by2], as_index=False).count()
     rate_per_age.rename(columns={"accident_index": "count"}, inplace=True)
     rate_per_age.reset_index()
     rate_per_age['count'] = (rate_per_age['count'] / district_ratio)
-    rate_per_age = rate_per_age[rate_per_age[AGGREGATE_BY] != -1]  # remove -1 missing value
-    rate_per_age[AGGREGATE_BY] = rate_per_age[AGGREGATE_BY].replace([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
-                                                                    x_labels)  # correct x label values
-    rate_per_age['accident_severity'] = rate_per_age['accident_severity'].replace([1, 2, 3],
-                                                                                  ["Light", "Moderate", "Severe"])
+    rate_per_age = rate_per_age[rate_per_age[aggregate_by] != -1]  # remove -1 missing value
+    rate_per_age[aggregate_by] = rate_per_age[aggregate_by] \
+        .replace([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], x_labels)  # correct x label values
+    rate_per_age['accident_severity'] = rate_per_age['accident_severity'] \
+        .replace([1, 2, 3], ["Light", "Moderate", "Severe"])
     color_discrete_map = {'Light': '#FFC400', 'Moderate': '#FF7700', 'Severe': '#FF0000'}
 
-    if avUK == "yes":
+    # Depending on state of radiobutton, either show or do not show complete UK data as well.
+    if av_uk == "yes":
         # total UK data added - add data description
-        df_full_data[AGGREGATE_BY] = pd.to_numeric(df_full_data[AGGREGATE_BY], errors="coerce")
-        df_full_data = df_full_data[["accident_index", AGGREGATE_BY, AGGREGATE_BY2]]
-        rate_per_age_fulldata = df_full_data.groupby([AGGREGATE_BY, AGGREGATE_BY2], as_index=False).count()
-        rate_per_age_fulldata.rename(columns={"accident_index": "count"}, inplace=True)
-        rate_per_age_fulldata.reset_index()
-        rate_per_age_fulldata['count'] = (rate_per_age_fulldata['count'] / UK_ratio)
-        rate_per_age_fulldata = rate_per_age_fulldata[
-            rate_per_age_fulldata[AGGREGATE_BY] != -1]  # remove -1 missing value
-        rate_per_age_fulldata[AGGREGATE_BY] = rate_per_age_fulldata[AGGREGATE_BY].replace(
+        df_full_data[aggregate_by] = pd.to_numeric(df_full_data[aggregate_by], errors="coerce")
+        df_full_data = df_full_data[["accident_index", aggregate_by, aggregate_by2]]
+        rate_per_age_full_data = df_full_data.groupby([aggregate_by, aggregate_by2], as_index=False).count()
+        rate_per_age_full_data.rename(columns={"accident_index": "count"}, inplace=True)
+        rate_per_age_full_data.reset_index()
+        rate_per_age_full_data['count'] = (rate_per_age_full_data['count'] / uk_ratio)
+        rate_per_age_full_data = rate_per_age_full_data[
+            rate_per_age_full_data[aggregate_by] != -1]  # remove -1 missing value
+        rate_per_age_full_data[aggregate_by] = rate_per_age_full_data[aggregate_by].replace(
             [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], x_labels)  # correct x label values
-        rate_per_age_fulldata['accident_severity'] = rate_per_age_fulldata['accident_severity'].replace([1, 2, 3],
-                                                                                                        ["Light",
-                                                                                                         "Moderate",
-                                                                                                         "Severe"])
+        rate_per_age_full_data['accident_severity'] = rate_per_age_full_data['accident_severity'] \
+            .replace([1, 2, 3], ["Light", "Moderate", "Severe"])
 
         fig = go.Figure()
-        fig.add_trace(go.Bar(x=rate_per_age[AGGREGATE_BY], y=rate_per_age['count'],
-                             name='Selected districts', marker_color="blue",
-                             ))
-        fig.add_trace(go.Bar(x=rate_per_age_fulldata[AGGREGATE_BY], y=rate_per_age_fulldata['count'],
-                             name='Total UK', marker_color="red"
-                             ))
+        fig.add_trace(go.Bar(x=rate_per_age[aggregate_by], y=rate_per_age['count'],
+                             name='Selected districts', marker_color="blue"))
+        fig.add_trace(go.Bar(x=rate_per_age_full_data[aggregate_by], y=rate_per_age_full_data['count'],
+                             name='Total UK', marker_color="red"))
 
-    if avUK == "no":
-        fig = px.bar(rate_per_age, x=AGGREGATE_BY, y="count", color=AGGREGATE_BY2, title=title,
+    else:
+        fig = px.bar(rate_per_age, x=aggregate_by, y="count", color=aggregate_by2, title=title,
                      color_discrete_map=color_discrete_map,
                      category_orders={"accident_severity": ["Severe", "Moderate", "Light"]})
 
@@ -405,65 +402,62 @@ def accidents_per_propulsion_code(dff, year, df_full_data, avUK, district_ratio,
     fig_layout = fig["layout"]
     fig_data = fig["data"]
 
-    fig_data, fig_layout = get_graph_layout(fig_layout, fig_data)
+    get_graph_layout(fig_layout, fig_data)
 
     return fig
 
 
-def accidents_per_sex_of_driver(dff, year, df_full_data, avUK, district_ratio, UK_ratio):
+def accidents_per_sex_of_driver(dff, year, df_full_data, av_uk, district_ratio, uk_ratio):
     """
     This function generates the right side figure displaying accidents per sex of driver
     """
+    # Determine title of plot
     if year == 'sum':
         title = "Accidents per sex of driver for 2016-2020 per 100.000 people"
     else:
         title = "Accidents per sex of driver for {0} per 100.000 people".format(year)
 
-    AGGREGATE_BY = "sex_of_driver"
-    AGGREGATE_BY2 = "accident_severity"
+    aggregate_by = "sex_of_driver"
+    aggregate_by2 = "accident_severity"
     x_labels = ['Male', 'Female', 'Not known']
 
-    # data selected countries
-    dff[AGGREGATE_BY] = pd.to_numeric(dff[AGGREGATE_BY], errors="coerce")
-    dff = dff[["accident_index", AGGREGATE_BY, AGGREGATE_BY2]]
-    rate_per_age = dff.groupby([AGGREGATE_BY, AGGREGATE_BY2], as_index=False).count()
+    # Edit dataframe data as preparation for plot
+    dff[aggregate_by] = pd.to_numeric(dff[aggregate_by], errors="coerce")
+    dff = dff[["accident_index", aggregate_by, aggregate_by2]]
+    rate_per_age = dff.groupby([aggregate_by, aggregate_by2], as_index=False).count()
     rate_per_age.rename(columns={"accident_index": "count"}, inplace=True)
     rate_per_age.reset_index()
     rate_per_age['count'] = (rate_per_age['count'] / district_ratio)
     # rate_per_age.drop([0,1,2], inplace=True)
-    rate_per_age = rate_per_age[rate_per_age[AGGREGATE_BY] != -1]  # remove -1 missing value
-    rate_per_age[AGGREGATE_BY] = rate_per_age[AGGREGATE_BY].replace([1, 2, 3], x_labels)  # correct x label values
-    rate_per_age['accident_severity'] = rate_per_age['accident_severity'].replace([1, 2, 3],
-                                                                                  ["Light", "Moderate", "Severe"])
+    rate_per_age = rate_per_age[rate_per_age[aggregate_by] != -1]  # remove -1 missing value
+    rate_per_age[aggregate_by] = rate_per_age[aggregate_by].replace([1, 2, 3], x_labels)  # correct x label values
+    rate_per_age['accident_severity'] = rate_per_age['accident_severity'] \
+        .replace([1, 2, 3], ["Light", "Moderate", "Severe"])
     color_discrete_map = {'Light': '#FFC400', 'Moderate': '#FF7700', 'Severe': '#FF0000'}
 
-    if avUK == "yes":
-        # total UK data added - add data description
-        df_full_data[AGGREGATE_BY] = pd.to_numeric(df_full_data[AGGREGATE_BY], errors="coerce")
-        df_full_data = df_full_data[["accident_index", AGGREGATE_BY, AGGREGATE_BY2]]
-        rate_per_age_fulldata = df_full_data.groupby([AGGREGATE_BY, AGGREGATE_BY2], as_index=False).count()
-        rate_per_age_fulldata.rename(columns={"accident_index": "count"}, inplace=True)
-        rate_per_age_fulldata.reset_index()
-        # rate_per_age_fulldata.drop([0,1,2], inplace=True)
-        rate_per_age_fulldata['count'] = (rate_per_age_fulldata['count'] / UK_ratio)
-        rate_per_age_fulldata = rate_per_age_fulldata[
-            rate_per_age_fulldata[AGGREGATE_BY] != -1]  # remove -1 missing value
-        rate_per_age_fulldata[AGGREGATE_BY] = rate_per_age_fulldata[AGGREGATE_BY].replace([1, 2, 3],
-                                                                                          x_labels)  # correct x label values
-        rate_per_age_fulldata['accident_severity'] = rate_per_age_fulldata['accident_severity'].replace([1, 2, 3],
-                                                                                                        ["Light",
-                                                                                                         "Moderate",
-                                                                                                         "Severe"])
-        fig = go.Figure()
-        fig.add_trace(go.Bar(x=rate_per_age[AGGREGATE_BY], y=rate_per_age['count'],
-                             name='Selected districts', marker_color="blue",
-                             ))
-        fig.add_trace(go.Bar(x=rate_per_age_fulldata[AGGREGATE_BY], y=rate_per_age_fulldata['count'],
-                             name='Total UK', marker_color="red"
-                             ))
+    # Depending on state of radiobutton, either show or do not show complete UK data as well.
+    if av_uk == "yes":
+        # total UK data added
+        df_full_data[aggregate_by] = pd.to_numeric(df_full_data[aggregate_by], errors="coerce")
+        df_full_data = df_full_data[["accident_index", aggregate_by, aggregate_by2]]
+        rate_per_age_full_data = df_full_data.groupby([aggregate_by, aggregate_by2], as_index=False).count()
+        rate_per_age_full_data.rename(columns={"accident_index": "count"}, inplace=True)
+        rate_per_age_full_data.reset_index()
+        rate_per_age_full_data['count'] = (rate_per_age_full_data['count'] / uk_ratio)
+        rate_per_age_full_data = rate_per_age_full_data[
+            rate_per_age_full_data[aggregate_by] != -1]  # remove -1 missing value
+        rate_per_age_full_data[aggregate_by] = rate_per_age_full_data[aggregate_by] \
+            .replace([1, 2, 3], x_labels)  # correct x label values
+        rate_per_age_full_data['accident_severity'] = rate_per_age_full_data['accident_severity'] \
+            .replace([1, 2, 3], ["Light", "Moderate", "Severe"])
 
-    if avUK == "no":
-        fig = px.bar(rate_per_age, x=AGGREGATE_BY, y="count", color=AGGREGATE_BY2, title=title,
+        fig = go.Figure()
+        fig.add_trace(go.Bar(x=rate_per_age[aggregate_by], y=rate_per_age['count'],
+                             name='Selected districts', marker_color="blue"))
+        fig.add_trace(go.Bar(x=rate_per_age_full_data[aggregate_by], y=rate_per_age_full_data['count'],
+                             name='Total UK', marker_color="red"))
+    else:
+        fig = px.bar(rate_per_age, x=aggregate_by, y="count", color=aggregate_by2, title=title,
                      color_discrete_map=color_discrete_map,
                      category_orders={"accident_severity": ["Severe", "Moderate", "Light"]})
 
@@ -474,65 +468,63 @@ def accidents_per_sex_of_driver(dff, year, df_full_data, avUK, district_ratio, U
     fig_layout = fig["layout"]
     fig_data = fig["data"]
 
-    fig_data, fig_layout = get_graph_layout(fig_layout, fig_data)
+    get_graph_layout(fig_layout, fig_data)
 
     return fig
 
 
-def accidents_per_urban_or_rural_area(dff, year, df_full_data, avUK, district_ratio, UK_ratio):
+def accidents_per_urban_or_rural_area(dff, year, df_full_data, av_uk, district_ratio, uk_ratio):
     """
     This function generates the right side figure displaying accidents per urban or rural area
     """
+    # Determine title of plot
     if year == 'sum':
         title = "Accidents per urban or rural area for 2016-2020 per 100.000 people"
     else:
         title = "Accidents per urban or rural area for {0} per 100.000 people".format(year)
 
-    AGGREGATE_BY = "urban_or_rural_area"
-    AGGREGATE_BY2 = "accident_severity"
+    aggregate_by = "urban_or_rural_area"
+    aggregate_by2 = "accident_severity"
     x_labels = ["Urban", "Rural", " "]
 
-    # data selected countries
-    dff[AGGREGATE_BY] = pd.to_numeric(dff[AGGREGATE_BY], errors="coerce")
-    dff = dff[["accident_index", AGGREGATE_BY, AGGREGATE_BY2]]
-    rate_per_age = dff.groupby([AGGREGATE_BY, AGGREGATE_BY2], as_index=False).count()
+    # Edit dataframe data as preparation for plot
+    dff[aggregate_by] = pd.to_numeric(dff[aggregate_by], errors="coerce")
+    dff = dff[["accident_index", aggregate_by, aggregate_by2]]
+    rate_per_age = dff.groupby([aggregate_by, aggregate_by2], as_index=False).count()
     rate_per_age.rename(columns={"accident_index": "count"}, inplace=True)
     rate_per_age.reset_index()
     rate_per_age['count'] = (rate_per_age['count'] / district_ratio)
-    rate_per_age[AGGREGATE_BY] = rate_per_age[AGGREGATE_BY].replace([1, 2, 3],
-                                                                    x_labels)  # correct x label values to urban and rural
-    rate_per_age[AGGREGATE_BY2] = rate_per_age[AGGREGATE_BY2].replace([1, 2, 3], ["Light", "Moderate",
-                                                                                  "Severe"])  # colors of severity
+    rate_per_age[aggregate_by] = rate_per_age[aggregate_by] \
+        .replace([1, 2, 3], x_labels)  # correct x label values to urban and rural
+    rate_per_age[aggregate_by2] = rate_per_age[aggregate_by2] \
+        .replace([1, 2, 3], ["Light", "Moderate", "Severe"])  # colors of severity
     color_discrete_map = {'Light': '#FFC400', 'Moderate': '#FF7700', 'Severe': '#FF0000'}
 
-    if avUK == "yes":
-        # total UK data added - add data description
-        df_full_data[AGGREGATE_BY] = pd.to_numeric(df_full_data[AGGREGATE_BY], errors="coerce")
-        df_full_data = df_full_data[["accident_index", AGGREGATE_BY, AGGREGATE_BY2]]
-        rate_per_age_fulldata = df_full_data.groupby([AGGREGATE_BY, AGGREGATE_BY2], as_index=False).count()
-        rate_per_age_fulldata.rename(columns={"accident_index": "count"}, inplace=True)
-        rate_per_age_fulldata.reset_index()
-        rate_per_age_fulldata['count'] = (rate_per_age_fulldata['count'] / UK_ratio)
-        # rate_per_age_fulldata = rate_per_age_fulldata[rate_per_age_fulldata[AGGREGATE_BY] != 3]
-        rate_per_age_fulldata[AGGREGATE_BY] = rate_per_age_fulldata[AGGREGATE_BY].replace([1, 2, 3],
-                                                                                          x_labels)  # correct x label values to urban and rural
-        rate_per_age_fulldata[AGGREGATE_BY2] = rate_per_age_fulldata[AGGREGATE_BY2].replace([1, 2, 3],
-                                                                                            ["Light", "Moderate",
-                                                                                             "Severe"])  # colors of severity
+    # Depending on state of radiobutton, either show or do not show complete UK data as well.
+    if av_uk == "yes":
+        # total UK data added
+        df_full_data[aggregate_by] = pd.to_numeric(df_full_data[aggregate_by], errors="coerce")
+        df_full_data = df_full_data[["accident_index", aggregate_by, aggregate_by2]]
+        rate_per_age_full_data = df_full_data.groupby([aggregate_by, aggregate_by2], as_index=False).count()
+        rate_per_age_full_data.rename(columns={"accident_index": "count"}, inplace=True)
+        rate_per_age_full_data.reset_index()
+        rate_per_age_full_data['count'] = (rate_per_age_full_data['count'] / uk_ratio)
+        rate_per_age_full_data[aggregate_by] = rate_per_age_full_data[aggregate_by] \
+            .replace([1, 2, 3], x_labels)  # correct x label values to urban and rural
+        rate_per_age_full_data[aggregate_by2] = rate_per_age_full_data[aggregate_by2] \
+            .replace([1, 2, 3], ["Light", "Moderate", "Severe"])  # colors of severity
 
         fig = go.Figure()
-        fig.add_trace(go.Bar(x=rate_per_age[AGGREGATE_BY], y=rate_per_age['count'],
-                             name='Selected districts', marker_color="blue",
-                             ))
-        fig.add_trace(go.Bar(x=rate_per_age_fulldata[AGGREGATE_BY], y=rate_per_age_fulldata['count'],
-                             name='Total UK', marker_color="red"
-                             ))
-
-    if avUK == "no":
-        fig = px.bar(rate_per_age, x=AGGREGATE_BY, y="count", color=AGGREGATE_BY2, title=title,
+        fig.add_trace(go.Bar(x=rate_per_age[aggregate_by], y=rate_per_age['count'],
+                             name='Selected districts', marker_color="blue"))
+        fig.add_trace(go.Bar(x=rate_per_age_full_data[aggregate_by], y=rate_per_age_full_data['count'],
+                             name='Total UK', marker_color="red"))
+    else:
+        fig = px.bar(rate_per_age, x=aggregate_by, y="count", color=aggregate_by2, title=title,
                      color_discrete_map=color_discrete_map,
                      category_orders={"accident_severity": ["Severe", "Moderate", "Light"]})
 
+    # Edit layout of graph
     fig.update_layout(xaxis_title="Urban or rural area")
     fig.update_layout(yaxis_title="Number of accidents")
     fig.update_layout(legend_title_text='Accident Severity')
@@ -554,59 +546,60 @@ def accidents_per_urban_or_rural_area(dff, year, df_full_data, avUK, district_ra
 
     return fig
 
-def accidents_per_left_right_hand(dff, year, df_full_data, avUK, district_ratio, UK_ratio):
+
+def accidents_per_left_right_hand(dff, year, df_full_data, av_uk, district_ratio, uk_ratio):
     """
     This function generates the right side figure displaying accidents per left- or righthand driver
     """
+    # Determine title of graph
     if year == 'sum':
         title = "Accidents per left- or righthand driver for 2016-2020 per 100.000 people"
     else:
         title = "Accidents per left- or righthand driver for {0} per 100.000 people".format(year)
 
-    AGGREGATE_BY = "vehicle_left_hand_drive"
-    AGGREGATE_BY2 = "accident_severity"
+    aggregate_by = "vehicle_left_hand_drive"
+    aggregate_by2 = "accident_severity"
     x_labels = ["Right", "Left"]
 
-    # data selected countries
-    dff[AGGREGATE_BY] = pd.to_numeric(dff[AGGREGATE_BY], errors="coerce")
-    dff = dff[["accident_index", AGGREGATE_BY, AGGREGATE_BY2]]
-    rate_per_age = dff.groupby([AGGREGATE_BY, AGGREGATE_BY2], as_index=False).count()
+    # Edit dataframe as preparation for plot
+    dff[aggregate_by] = pd.to_numeric(dff[aggregate_by], errors="coerce")
+    dff = dff[["accident_index", aggregate_by, aggregate_by2]]
+    rate_per_age = dff.groupby([aggregate_by, aggregate_by2], as_index=False).count()
     rate_per_age.rename(columns={"accident_index": "count"}, inplace=True)
     rate_per_age.reset_index()
     rate_per_age['count'] = (rate_per_age['count'] / district_ratio)
-    rate_per_age = rate_per_age[rate_per_age[AGGREGATE_BY] != -1]  # drop missing values
-    rate_per_age = rate_per_age[rate_per_age[AGGREGATE_BY] != 9]  # drop missing values
-    rate_per_age[AGGREGATE_BY] = rate_per_age[AGGREGATE_BY].replace([1, 2],
-                                                                    x_labels)  # correct x label values to urban and rural
-    rate_per_age[AGGREGATE_BY2] = rate_per_age[AGGREGATE_BY2].replace([1, 2, 3], ["Light", "Moderate",
-                                                                                  "Severe"])  # colors of severity
+    rate_per_age = rate_per_age[rate_per_age[aggregate_by] != -1]  # drop missing values
+    rate_per_age = rate_per_age[rate_per_age[aggregate_by] != 9]  # drop missing values
+    rate_per_age[aggregate_by] = rate_per_age[aggregate_by] \
+        .replace([1, 2], x_labels)  # correct x label values to urban and rural
+    rate_per_age[aggregate_by2] = rate_per_age[aggregate_by2] \
+        .replace([1, 2, 3], ["Light", "Moderate", "Severe"])  # colors of severity
     color_discrete_map = {'Light': '#FFC400', 'Moderate': '#FF7700', 'Severe': '#FF0000'}
 
-    if avUK == "yes":
-        # total UK data added - add data description
-        df_full_data[AGGREGATE_BY] = pd.to_numeric(df_full_data[AGGREGATE_BY], errors="coerce")
-        df_full_data = df_full_data[["accident_index", AGGREGATE_BY, AGGREGATE_BY2]]
-        rate_per_age_fulldata = df_full_data.groupby([AGGREGATE_BY, AGGREGATE_BY2], as_index=False).count()
-        rate_per_age_fulldata.rename(columns={"accident_index": "count"}, inplace=True)
-        rate_per_age_fulldata.reset_index()
-        rate_per_age_fulldata['count'] = (rate_per_age_fulldata['count'] / UK_ratio)
-        rate_per_age_fulldata = rate_per_age_fulldata[rate_per_age_fulldata[AGGREGATE_BY] != -1]  # drop missing values
-        rate_per_age_fulldata = rate_per_age_fulldata[rate_per_age_fulldata[AGGREGATE_BY] != 9]  # drop missing values
-        rate_per_age_fulldata[AGGREGATE_BY] = rate_per_age_fulldata[AGGREGATE_BY].replace([1, 2],
-                                                                                          x_labels)  # correct x label values to urban and rural
-        rate_per_age_fulldata[AGGREGATE_BY2] = rate_per_age_fulldata[AGGREGATE_BY2].replace([1, 2, 3],
-                                                                                            ["Light", "Moderate",
-                                                                                             "Severe"])  # colors of severity
-        fig = go.Figure()
-        fig.add_trace(go.Bar(x=rate_per_age[AGGREGATE_BY], y=rate_per_age['count'],
-                             name='Selected districts', marker_color="blue",
-                             ))
-        fig.add_trace(go.Bar(x=rate_per_age_fulldata[AGGREGATE_BY], y=rate_per_age_fulldata['count'],
-                             name='Total UK', marker_color="red"
-                             ))
+    # Depending on state of radiobutton, either show or do not show complete UK data as well.
+    if av_uk == "yes":
+        # total UK data added
+        df_full_data[aggregate_by] = pd.to_numeric(df_full_data[aggregate_by], errors="coerce")
+        df_full_data = df_full_data[["accident_index", aggregate_by, aggregate_by2]]
+        rate_per_age_full_data = df_full_data.groupby([aggregate_by, aggregate_by2], as_index=False).count()
+        rate_per_age_full_data.rename(columns={"accident_index": "count"}, inplace=True)
+        rate_per_age_full_data.reset_index()
+        rate_per_age_full_data['count'] = (rate_per_age_full_data['count'] / uk_ratio)
+        # drop missing values
+        rate_per_age_full_data = rate_per_age_full_data[rate_per_age_full_data[aggregate_by] != -1]
+        rate_per_age_full_data = rate_per_age_full_data[rate_per_age_full_data[aggregate_by] != 9]
+        rate_per_age_full_data[aggregate_by] = rate_per_age_full_data[aggregate_by] \
+            .replace([1, 2], x_labels)  # correct x label values to urban and rural
+        rate_per_age_full_data[aggregate_by2] = rate_per_age_full_data[aggregate_by2] \
+            .replace([1, 2, 3], ["Light", "Moderate", "Severe"])  # colors of severity
 
-    if avUK == "no":
-        fig = px.bar(rate_per_age, x=AGGREGATE_BY, y="count", color=AGGREGATE_BY2, title=title,
+        fig = go.Figure()
+        fig.add_trace(go.Bar(x=rate_per_age[aggregate_by], y=rate_per_age['count'],
+                             name='Selected districts', marker_color="blue"))
+        fig.add_trace(go.Bar(x=rate_per_age_full_data[aggregate_by], y=rate_per_age_full_data['count'],
+                             name='Total UK', marker_color="red"))
+    else:
+        fig = px.bar(rate_per_age, x=aggregate_by, y="count", color=aggregate_by2, title=title,
                      color_discrete_map=color_discrete_map,
                      category_orders={"accident_severity": ["Severe", "Moderate", "Light"]})
 
@@ -618,12 +611,17 @@ def accidents_per_left_right_hand(dff, year, df_full_data, avUK, district_ratio,
     fig_layout = fig["layout"]
     fig_data = fig["data"]
 
-    fig_data, fig_layout = get_graph_layout(fig_layout, fig_data)
+    get_graph_layout(fig_layout, fig_data)
 
     return fig
 
 
 def get_graph_layout(fig_layout, fig_data):
+    """
+    Function that gives a given fig_layout and fig_data the standard layout used in this visualization
+    :param fig_layout:  The fig_layout to edit. Obtainable through fig['layout'].
+    :param fig_data:    The fig_data to edit. Obtainable through fig['data']
+    """
     fig_data[0]["textposition"] = "outside"
     fig_layout["paper_bgcolor"] = "#e3e3e3"
     fig_layout["plot_bgcolor"] = "#e3e3e3"
@@ -637,4 +635,3 @@ def get_graph_layout(fig_layout, fig_data):
     fig_layout["margin"]["r"] = 50
     fig_layout["margin"]["b"] = 100
     fig_layout["margin"]["l"] = 50
-    return fig_data, fig_layout

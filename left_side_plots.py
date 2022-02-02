@@ -24,9 +24,10 @@ def initialize_left_side_functionality(app, df_lat_lon):
     def display_map(district_list, year, figure):
         """
         This function generates what is shown on the map on the left side of the visualiztion
-        :param year:    The year of the dropdown.
-        :param figure:
-        :return:        The figure to be shown
+        :param district_list:   The list of selected districts.
+        :param year:            The year of the dropdown.
+        :param figure:          The figure itself
+        :return:                The figure to be shown
         """
 
         districts = []
@@ -41,20 +42,21 @@ def initialize_left_side_functionality(app, df_lat_lon):
         else:
             variable_name = "number_of_accidents_" + str(year)
 
-        def color(x, max, county_name):
+        def color(x, max_of_scope, district_name):
             """
             A local function to generate a color for the overlay for all the data.
-            :param x:       The value for which a color needs to be generated
-            :param max:     The max value of the scale
-            :return:        An rgb color value
+            :param x:               The value for which a color needs to be generated
+            :param max_of_scope:    The max value of the scale
+            :param district_name:   Name of county to check whether it is in the list of selected counties.
+            :return:                An rgb color value
             """
             max_val = 255
             if x <= 0:
                 return rgb2hex(191, 191, 191)
 
-            val = int((x / max) * max_val)
+            val = int((x / max_of_scope) * max_val)
 
-            if districts is not None and county_name in districts:
+            if districts is not None and district_name in districts:
                 return rgb2hex(230, max_val - val, max_val - val)
 
             return rgb2hex(255, max_val - val, max_val - val)
@@ -115,15 +117,15 @@ def initialize_left_side_functionality(app, df_lat_lon):
         ]
 
         # Then the little bars
-        binsize = int(maximum / 5)
-        for i in range(1, maximum, binsize - 1):
+        bin_size = int(maximum / 5)
+        for i in range(1, maximum, bin_size - 1):
             col = color(i, maximum, "dkdkkd")
             annotations.append(
                 dict(
                     arrowcolor=col,
                     text=str(i),
                     x=0.95,
-                    y=0.85 - ((i / (binsize - 1)) / 20),
+                    y=0.85 - ((i / (bin_size - 1)) / 20),
                     ax=-60,
                     ay=0,
                     arrowwidth=5,
@@ -132,10 +134,9 @@ def initialize_left_side_functionality(app, df_lat_lon):
                 )
             )
 
-        if "layout" in figure:
-            lat = figure["layout"]["mapbox"]["center"]["lat"]
-            lon = figure["layout"]["mapbox"]["center"]["lon"]
-            zoom = figure["layout"]["mapbox"]["zoom"]
+        lat = figure["layout"]["mapbox"]["center"]["lat"]
+        lon = figure["layout"]["mapbox"]["center"]["lon"]
+        zoom = figure["layout"]["mapbox"]["zoom"]
 
         # Here we use the mapbox api to get the map
         layout = dict(
@@ -169,8 +170,16 @@ def initialize_left_side_functionality(app, df_lat_lon):
         fig = dict(data=data, layout=layout)
         return fig
 
-    @app.callback(Output("heatmap-title", "children"), [Input("years-dropdown", "value")])
+    @app.callback(
+        Output("heatmap-title", "children"),
+        [Input("years-dropdown", "value")]
+    )
     def update_map_title(year):
+        """
+        Callback function that determines the title of the heatmap
+        :param year:    The selected year
+        :return:        The title of the figure
+        """
         if year == 'sum':
             return "heatmap of population adjusted accident rate of last 5 years"
 
