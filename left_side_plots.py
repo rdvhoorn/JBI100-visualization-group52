@@ -1,3 +1,5 @@
+import math
+
 from dash.dependencies import Input, Output, State
 import cufflinks as cf
 import json
@@ -75,7 +77,7 @@ def initialize_left_side_functionality(app, df_lat_lon):
                 accidents_per_100000.append(
                     int(feature['properties'][variable_name] / feature['properties']['population'] * 100000))
 
-        maximum = max(accidents_per_100000)
+        maximum = math.ceil(max(accidents_per_100000)/500)*500
 
         # Make up hover text
         hover_text_df = df_lat_lon["Hover"].to_frame()
@@ -116,9 +118,9 @@ def initialize_left_side_functionality(app, df_lat_lon):
         ]
 
         # Then the little bars
-        bin_size = int(maximum / 5)
-        for i in range(1, maximum, bin_size - 1):
-            col = color(i, maximum, "dkdkkd")
+        bin_size = 500
+        for i in range(0, maximum, bin_size):
+            col = color(i+1, maximum+1, "dkdkkd")
             annotations.append(
                 dict(
                     arrowcolor=col,
