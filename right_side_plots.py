@@ -552,6 +552,8 @@ def accidents_per_urban_or_rural_area(dff, year, df_full_data, avUK, district_ra
     fig_layout["margin"]["b"] = 100
     fig_layout["margin"]["l"] = 50
 
+    return fig
+
 def accidents_per_left_right_hand(dff, year, df_full_data, avUK, district_ratio, UK_ratio):
     """
     This function generates the right side figure displaying accidents per left- or righthand driver
