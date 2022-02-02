@@ -69,11 +69,11 @@ app.layout = html.Div(
                                         html.P(
                                             children=[
                                                 "This visualization tool is to help ensurance companies to explore " +
-                                                "information about acr accidents in the UK on a wide scale. Through "
+                                                "information about acr accidents in England on a wide scale. Through "
                                                 "using this tool, districts can be found that might differ from the "
-                                                "average UK values for certain metrics which can prompt further "
-                                                "in-depth investigation. First, select a year to inspect in the "
-                                                "dropdown to the right of this text (or 'Aggregate' for the"
+                                                "average values for England for certain metrics which can prompt "
+                                                "further in-depth investigation. First, select a year to inspect in the"
+                                                " dropdown to the right of this text (or 'Aggregate' for the"
                                                 " aggregation of all data). You can look at the data that appears on "
                                                 "the map now! You can use the lasso tool to select a set of districts "
                                                 "which will upon selecting show various graphs on the right-hand side."]
@@ -178,7 +178,7 @@ app.layout = html.Div(
                                             value="show_accidents_per_age",
                                             id="chart-dropdown",
                                         ),
-                                        html.P(id="avUK_radio_item", children="Show graph of total UK to compare:"),
+                                        html.P(id="avUK_radio_item", children="Show graph of total England to compare:"),
                                         dcc.RadioItems(
                                             options=[
                                                 {'label': 'Yes', 'value': 'yes'},

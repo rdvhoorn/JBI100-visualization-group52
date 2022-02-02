@@ -182,7 +182,7 @@ def accidents_per_vehicle_age(dff, year, df_full_data, av_uk, district_ratio, uk
         fig.add_trace(go.Bar(x=rate_per_age[AGGREGATE_BY], y=rate_per_age['count'],
                              name='Selected districts', marker_color="blue"))
         fig.add_trace(go.Bar(x=rate_per_age_full_data[AGGREGATE_BY], y=rate_per_age_full_data['count'],
-                             name='Total UK', marker_color="red"))
+                             name='Total for England', marker_color="red"))
     else:
         fig = px.bar(rate_per_age, x=AGGREGATE_BY, y="count", color=AGGREGATE_BY2, title=title,
                      color_discrete_map=color_discrete_map,
@@ -247,7 +247,7 @@ def accidents_per_engine_capacity(dff, year, df_full_data, av_uk, district_ratio
         fig.add_trace(go.Histogram(x=rate_per_age[aggregate_by], y=rate_per_age['count'],
                                    name='Selected districts', marker_color="blue", nbinsx=20))
         fig.add_trace(go.Histogram(x=rate_per_age_full_data[aggregate_by], y=rate_per_age_full_data['count'],
-                                   name='Total UK', marker_color="red", nbinsx=20))
+                                   name='Total for England', marker_color="red", nbinsx=20))
     else:
         fig = px.histogram(rate_per_age, x=aggregate_by, y="count", color=aggregate_by2, title=title,
                            color_discrete_map=color_discrete_map,
@@ -319,7 +319,7 @@ def accidents_per_time(dff, year, df_full_data, av_uk, district_ratio, uk_ratio)
         fig.add_trace(go.Bar(x=rate_per_age_2[aggregate_by], y=rate_per_age_2['count'],
                              name='Selected districts', marker_color="blue"))
         fig.add_trace(go.Bar(x=rate_per_age_full_data_2[aggregate_by], y=rate_per_age_full_data_2['count'],
-                             name='Total UK', marker_color="red"))
+                             name='Total for England', marker_color="red"))
     else:
         fig = px.bar(rate_per_age_2, x=aggregate_by, y="count", color=aggregate_by2, title=title,
                      color_discrete_map=color_discrete_map,
@@ -387,7 +387,7 @@ def accidents_per_propulsion_code(dff, year, df_full_data, av_uk, district_ratio
         fig.add_trace(go.Bar(x=rate_per_age[aggregate_by], y=rate_per_age['count'],
                              name='Selected districts', marker_color="blue"))
         fig.add_trace(go.Bar(x=rate_per_age_full_data[aggregate_by], y=rate_per_age_full_data['count'],
-                             name='Total UK', marker_color="red"))
+                             name='Total for England', marker_color="red"))
 
     else:
         fig = px.bar(rate_per_age, x=aggregate_by, y="count", color=aggregate_by2, title=title,
@@ -455,7 +455,7 @@ def accidents_per_sex_of_driver(dff, year, df_full_data, av_uk, district_ratio, 
         fig.add_trace(go.Bar(x=rate_per_age[aggregate_by], y=rate_per_age['count'],
                              name='Selected districts', marker_color="blue"))
         fig.add_trace(go.Bar(x=rate_per_age_full_data[aggregate_by], y=rate_per_age_full_data['count'],
-                             name='Total UK', marker_color="red"))
+                             name='Total for England', marker_color="red"))
     else:
         fig = px.bar(rate_per_age, x=aggregate_by, y="count", color=aggregate_by2, title=title,
                      color_discrete_map=color_discrete_map,
@@ -518,7 +518,7 @@ def accidents_per_urban_or_rural_area(dff, year, df_full_data, av_uk, district_r
         fig.add_trace(go.Bar(x=rate_per_age[aggregate_by], y=rate_per_age['count'],
                              name='Selected districts', marker_color="blue"))
         fig.add_trace(go.Bar(x=rate_per_age_full_data[aggregate_by], y=rate_per_age_full_data['count'],
-                             name='Total UK', marker_color="red"))
+                             name='Total for England', marker_color="red"))
     else:
         fig = px.bar(rate_per_age, x=aggregate_by, y="count", color=aggregate_by2, title=title,
                      color_discrete_map=color_discrete_map,
@@ -597,7 +597,7 @@ def accidents_per_left_right_hand(dff, year, df_full_data, av_uk, district_ratio
         fig.add_trace(go.Bar(x=rate_per_age[aggregate_by], y=rate_per_age['count'],
                              name='Selected districts', marker_color="blue"))
         fig.add_trace(go.Bar(x=rate_per_age_full_data[aggregate_by], y=rate_per_age_full_data['count'],
-                             name='Total UK', marker_color="red"))
+                             name='Total for England', marker_color="red"))
     else:
         fig = px.bar(rate_per_age, x=aggregate_by, y="count", color=aggregate_by2, title=title,
                      color_discrete_map=color_discrete_map,
