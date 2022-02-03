@@ -143,7 +143,7 @@ def initialize_right_side_tabs_functionality(app, df_full_data) -> None:
                 html.Tr(children=[
                     html.Th(),
                     html.Th("Selected districts"),
-                    html.Th("UK")
+                    html.Th("England")
                 ]),
                 html.Tr(children=[
                     html.Td("Number of accidents"),
