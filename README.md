@@ -15,3 +15,9 @@ Running can simply be done by running the `app.py` file.
 ```
 python ./app.py
 ```
+
+
+## Structure
+The left_side_plots.py file is the implementation of the choropleth map, the right_side_plots.py contains the
+implementation of the right side graphs, the right_side_tabs.py contains the implementation of the Select Districts
+and General Info tabs on the right side. App.py ties everything together.
