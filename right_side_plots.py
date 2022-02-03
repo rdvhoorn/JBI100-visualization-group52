@@ -24,7 +24,7 @@ def initialize_right_side_functionality(app, df_full_data, df_lat_lon):
             return dict(
                 data=[dict(x=0, y=0)],
                 layout=dict(
-                    title="Click-drag on the map to select counties",
+                    title="Click-drag on the map to select districts",
                     paper_bgcolor=(227, 227, 227),
                     plot_bgcolor=(227, 227, 227),
                     font=dict(color="#000000"),
